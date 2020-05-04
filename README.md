@@ -37,3 +37,7 @@ _None._
 ## Credits
 
 Thanks to the work of the Gutenberg team (particularly @aduth) in providing some inspiration for this approach to bundling various automations together.
+
+### Todo
+
+Inspired by this [todo probot app](https://github.com/JasonEtco/todo). Initial iterations of this action borrowed heavily from the ideas in this app.
