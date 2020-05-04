@@ -51889,7 +51889,7 @@ const automations = __webpack_require__(37);
 
 (async function initialize() {
   const token = getInput("github_token");
-  const types = getInput("automations");
+  const types = getInput("automations").split(",");
 
   if (typeof types !== "array") {
     setFailed(
@@ -51908,7 +51908,7 @@ const automations = __webpack_require__(37);
     `initialize: Received event = '${context.eventName}', action = '${context.payload.action}'`
   );
 
-  for (const { name, events, actions, runner } of automations) {
+  for (const { name, actions, runner } of automations) {
     if (
       event.includes(context.eventName) &&
       (actions === undefined || actions.includes(context.payload.action))
