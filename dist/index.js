@@ -194,10 +194,12 @@ module.exports = {"_from":"@octokit/rest@^16.15.0","_id":"@octokit/rest@16.43.1"
  * External dependencies
  */
 const { readdirSync } = __webpack_require__(747);
-
+const { path } = __webpack_require__(622);
 /** @typedef {import('./typedefs').AutomationTask} AutomationTask */
 
-const allDirs = readdirSync("automations", { withFileTypes: true })
+const allDirs = readdirSync(path.resolve("./automations"), {
+  withFileTypes: true,
+})
   .filter((file) => file.isDirectory())
   .map((file) => file.name);
 
