@@ -2757,7 +2757,7 @@ module.exports = async (context, octokit) => {
   /**
    * @type {TodoItem[]}
    */
-  const todos = getTodos(context, octokit);
+  const todos = await getTodos(context, octokit);
   todos.forEach(
     async ({
       keyword,
@@ -10892,7 +10892,7 @@ module.exports = async (context, octokit) => {
   /**
    * @type {TodoItem[]}
    */
-  const todos = getTodos(context, octokit);
+  const todos = await getTodos(context, octokit);
   todos.forEach(
     ({ keyword, title, content, fileName, range, sha, username, number }) => {
       // Does PR already have a comment for this item?
@@ -26677,7 +26677,7 @@ module.exports = async (context, octokit) => {
   /**
    * @type {TodoItem[]}
    */
-  const todos = getTodos(context, octokit);
+  const todos = await getTodos(context, octokit);
   todos.forEach(
     async ({ keyword, title, content, fileName, range, sha, username }) => {
       // Prevent duplicates
