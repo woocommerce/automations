@@ -10,5 +10,5 @@ inputs:
     description: A list of specific automations you want to run if you don't want to use them all in a given workflow. If not included, all of the current automations will run.
     required: false
 runs:
-  using: node12
-  main: lib/index.js
+  using: 'node12'
+  main: 'dist/index.js'
