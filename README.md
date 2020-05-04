@@ -34,6 +34,12 @@ jobs:
 
 _None._
 
+## Contributing
+
+This will be expanded, but for reference:
+
+- The dist/index.js file is compiled using `@zeit/ncc`. You can read instructions about using it [here](https://help.github.com/en/actions/building-actions/creating-a-javascript-action#commit-tag-and-push-your-action-to-github)
+
 ## Credits
 
 Thanks to the work of the Gutenberg team (particularly @aduth) in providing some inspiration for this approach to bundling various automations together.
