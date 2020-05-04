@@ -51889,7 +51889,7 @@ const automations = __webpack_require__(37);
 
 (async function initialize() {
   const token = getInput("github_token");
-  const types = getInput("automations") || [];
+  const types = getInput("automations");
 
   if (typeof types !== "array") {
     setFailed(
