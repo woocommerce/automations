@@ -20,6 +20,8 @@
   "dependencies": {
     "@actions/core": "^1.0.0",
     "@actions/github": "^1.0.0",
+    "hbs": "^4.1.1",
+    "leasot": "^10.3.0",
     "parse-diff": "^0.7.0"
   }
 }
