@@ -52799,7 +52799,6 @@ const ifNotFork = __webpack_require__(741);
 const automations = __webpack_require__(37);
 
 /**
- * @typedef {import('@actions/github').GitHub} Github
  * @typedef {import('./typedefs').AutomationTaskRunner} AutomationTaskRunner
  */
 
