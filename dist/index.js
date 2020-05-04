@@ -4088,7 +4088,7 @@ const runner = async (context, octokit) => {
   );
 };
 
-module.exports(runner);
+module.exports = runner;
 
 
 /***/ }),
