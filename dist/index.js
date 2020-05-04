@@ -1395,7 +1395,7 @@ exports.getUserAgent = getUserAgent;
  * External dependencies
  */
 const parseDiff = __webpack_require__(536);
-const lesot = __webpack_require__(664);
+const leasot = __webpack_require__(664);
 
 /**
  * Internal dependencies
@@ -1432,8 +1432,6 @@ module.exports = async (context, ocktokit) => {
   if (!diff) {
     return todos;
   }
-
-  const keywords = ["todo"];
 
   // Parse the diff as files
   const files = parseDiff(diff);
@@ -1493,8 +1491,6 @@ module.exports = async (context, ocktokit) => {
     })
   );
 };
-
-module.exports = todos;
 
 
 /***/ }),
