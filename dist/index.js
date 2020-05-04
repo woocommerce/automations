@@ -51891,7 +51891,7 @@ const automations = __webpack_require__(37);
   const token = getInput("github_token");
   const types = getInput("automations").split(",");
 
-  if (typeof types !== "array") {
+  if (types && typeof types !== "array") {
     setFailed(
       "initialize: The provided `automations` configuration object must be a list."
     );
