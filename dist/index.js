@@ -51873,7 +51873,7 @@ exports.default = parserFactory;
  * External dependencies
  */
 const { setFailed, getInput } = __webpack_require__(368);
-const { context, Github } = __webpack_require__(466);
+const { context, GitHub } = __webpack_require__(466);
 
 /**
  * Internal dependencies
