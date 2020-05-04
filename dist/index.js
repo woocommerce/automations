@@ -52825,9 +52825,9 @@ const automations = __webpack_require__(37);
     `initialize: Received event = '${context.eventName}', action = '${context.payload.action}'`
   );
 
-  for (const { name, actions, runner } of automations) {
+  for (const { name, events, actions, runner } of automations) {
     if (
-      event.includes(context.eventName) &&
+      events.includes(context.eventName) &&
       (actions === undefined || actions.includes(context.payload.action))
     ) {
       try {
