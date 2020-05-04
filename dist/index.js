@@ -197,7 +197,7 @@ const { readdirSync } = __webpack_require__(747);
 
 /** @typedef {import('./typedefs').AutomationTask} AutomationTask */
 
-const allDirs = readdirSync("./automations", { withFileTypes: true })
+const allDirs = readdirSync("automations", { withFileTypes: true })
   .filter((file) => file.isDirectory())
   .map((file) => file.name);
 
