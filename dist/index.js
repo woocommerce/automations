@@ -1441,8 +1441,11 @@ module.exports = async (context, octokit) => {
               }
 
               // Use leosot to get matching todos
+              debug(`get-todos: Filename being parsed: ${file.to}`);
+              console.log(file);
               const parsedTodos = leasot.parse(change.content, {
                 filename: file.to,
+                extension: "default",
               });
 
               // if no matches return;
@@ -52789,6 +52792,10 @@ const automations = __webpack_require__(37);
 /**
  * @typedef {import('./typedefs').AutomationTaskRunner} AutomationTaskRunner
  */
+
+// @todo Need to add tests for the various submodules in here.
+// Testing a multiline todo comment
+// to see how this works.
 
 (async function initialize() {
   const token = getInput("github_token");
