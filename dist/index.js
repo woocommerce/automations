@@ -958,10 +958,9 @@ async function getCommit(context, octokit) {
       },
     });
   } else {
-    const { number } = context.payload.issue.id;
-    return ocktokit.pulls.get({
+    return octokit.pulls.get({
       ...context.repo,
-      pull_number: number,
+      pull_number: context.payload.number,
       mediaType: {
         format: "diff",
       },
@@ -1413,13 +1412,13 @@ const getFirstSentence = (content) => {
  * Used to retrieve todo information for usage from the given context.
  *
  * @param {GitHubContext} context
- * @param {GitHub} ocktokit
+ * @param {GitHub} octokit
  *
  * @return TodoItem[]
  */
-module.exports = async (context, ocktokit) => {
+module.exports = async (context, octokit) => {
   // Get the diff for this commit or PR
-  const diff = await getDiff(context, ocktokit);
+  const diff = await getDiff(context, octokit);
   if (!diff) {
     return todos;
   }
@@ -7377,9 +7376,7 @@ function getFileBoundaries(lastChange, line, padding = 2) {
  * @returns {TodoDetails}
  */
 module.exports = ({ context, chunk, config, line }) => {
-  const number = context.payload.pull_request
-    ? context.payload.pull_request.number
-    : null;
+  const number = context.payload.pull_request ? context.payload.number : null;
 
   let username, sha;
   if (context.payload.head_commit) {
@@ -7392,19 +7389,10 @@ module.exports = ({ context, chunk, config, line }) => {
     sha = context.payload.pull_request.head.sha;
   }
 
-  let range;
-  if (!config.blobLines) {
-    // Don't show the blob
-    range = false;
-  } else {
-    const lastChange = chunk.changes[chunk.changes.length - 1];
-    const { start, end } = getFileBoundaries(
-      lastChange,
-      line,
-      config.blobLines
-    );
-    range = start === end ? `L${start}` : `L${start}-L${end}`;
-  }
+  const blobLines = config.blobLines || 10;
+  const lastChange = chunk.changes[chunk.changes.length - 1];
+  const { start, end } = getFileBoundaries(lastChange, line, blobLines);
+  const range = start === end ? `L${start}` : `L${start}-L${end}`;
 
   return {
     username,
@@ -11771,7 +11759,7 @@ const debug = __webpack_require__(69);
  * @param {GitHub} octokit
  */
 module.exports = async (context, octokit) => {
-  const pullNumber = context.issue.number;
+  const pullNumber = context.payload.number;
   const { data: comments } = await octokit.issues.listComments({
     ...context.repo,
     issue_number: pullNumber,
@@ -27582,7 +27570,7 @@ module.exports = async (context, octokit) => {
   // Only trigger on pushes to master
   if (
     context.payload.ref !==
-    `refs/heads/${context.payload / repository / master_branch}`
+    `refs/heads/${context.payload.repository.master_branch}`
   ) {
     return;
   }
