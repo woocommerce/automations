@@ -1386,6 +1386,7 @@ exports.getUserAgent = getUserAgent;
  */
 const parseDiff = __webpack_require__(536);
 const leasot = __webpack_require__(664);
+const path = __webpack_require__(622);
 
 /**
  * Internal dependencies
@@ -1441,12 +1442,15 @@ module.exports = async (context, octokit) => {
                 return;
               }
 
+              const fileName = file.to;
+              const extension = path.extname(fileName);
               // Use leosot to get matching todos
-              debug(`get-todos: Filename being parsed: ${file.to}`);
-              console.log(file);
+              debug(
+                `get-todos: Filename being parsed: ${fileName} extension: ${extension}`
+              );
               const parsedTodos = leasot.parse(change.content, {
-                filename: file.to,
-                extension: "default",
+                filename: fileName,
+                extension: extension,
               });
 
               // if no matches return;
@@ -1473,7 +1477,7 @@ module.exports = async (context, octokit) => {
                 keyword: todoItem.tag,
                 title,
                 content: todoItem.text,
-                fileName: file.to,
+                fileName,
                 chunk,
                 index,
                 ...extraDetails,
