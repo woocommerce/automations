@@ -1455,21 +1455,17 @@ module.exports = async (context, octokit) => {
               });
 
               // if no matches return;
-              if (!parsedTodos) {
+              if (!parsedTodos || parsedTodos.length === 0) {
                 return;
               }
 
               // okay so we have parsedTodos. This will be an array but
               // since we're matching against chunks there should only be
-              // one todo in a chunk, so we'll grab the first.
+              // one todo in a chunk change, so we'll grab the first.
               /**
                * @type {TodoComment}
                */
               const todoItem = parsedTodos[0];
-
-              if (!todoItem.tag) {
-                return;
-              }
 
               const extraDetails = getDetails({
                 context,
