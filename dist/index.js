@@ -1473,6 +1473,9 @@ module.exports = async (context, octokit) => {
                 line: change.ln || change.ln2,
               });
 
+              debug(`getTodos: Todo item parsed = ${todoItem}`);
+              console.log(todoItem);
+
               return {
                 keyword: todoItem.tag,
                 title,
