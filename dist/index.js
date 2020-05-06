@@ -1467,6 +1467,10 @@ module.exports = async (context, octokit) => {
                */
               const todoItem = parsedTodos[0];
 
+              if (!todoItem.tag) {
+                return;
+              }
+
               const extraDetails = getDetails({
                 context,
                 chunk,
