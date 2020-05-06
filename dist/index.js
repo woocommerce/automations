@@ -1444,12 +1444,17 @@ module.exports = async (context, octokit) => {
 
               const fileName = file.to;
               const extension = path.extname(fileName);
+
+              // leasot splits on newlines, so we need to make sure we add a newline
+              // to the change.content
+              const content = change.content + "\n";
+
               // Use leosot to get matching todos
               debug(
                 `get-todos: Filename being parsed: ${fileName} extension: ${extension}`
               );
-              debug(`getTodos: content being parsed is: ${change.content}`);
-              const parsedTodos = leasot.parse(change.content, {
+              debug(`getTodos: content being parsed is: ${content}`);
+              const parsedTodos = leasot.parse(content, {
                 filename: fileName,
                 extension: extension,
               });
@@ -2756,6 +2761,10 @@ module.exports = async (context, octokit) => {
    * @type {TodoItem[]}
    */
   const todos = await getTodos(context, octokit);
+  if (!todos || !Array.isArray(todos)) {
+    debug(`pullRequestHandler: No todos were found in the changeset.`);
+    return;
+  }
   todos.forEach(
     async ({
       keyword,
@@ -11781,6 +11790,11 @@ module.exports = async (context, octokit) => {
    * @type {TodoItem[]}
    */
   const todos = await getTodos(context, octokit);
+
+  if (!todos || !Array.isArray(todos)) {
+    debug(`pullRequestHandler: No todos were found in the changeset.`);
+    return;
+  }
   todos.forEach(
     ({ keyword, title, content, fileName, range, sha, username, number }) => {
       // Does PR already have a comment for this item?
@@ -27600,6 +27614,10 @@ module.exports = async (context, octokit) => {
    * @type {TodoItem[]}
    */
   const todos = await getTodos(context, octokit);
+  if (!todos || !Array.isArray(todos)) {
+    debug(`pullRequestHandler: No todos were found fin the changeset.`);
+    return;
+  }
   todos.forEach(
     async ({ keyword, title, content, fileName, range, sha, username }) => {
       // Prevent duplicates
