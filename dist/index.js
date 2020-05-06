@@ -1448,6 +1448,7 @@ module.exports = async (context, octokit) => {
               debug(
                 `get-todos: Filename being parsed: ${fileName} extension: ${extension}`
               );
+              debug(`getTodos: content being parsed is: ${change.content}`);
               const parsedTodos = leasot.parse(change.content, {
                 filename: fileName,
                 extension: extension,
