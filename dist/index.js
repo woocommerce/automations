@@ -4177,7 +4177,7 @@ const issueRenameHandler = __webpack_require__(876);
 const runnerMatrix = {
   pull_request: {
     opened: pullRequestHandler,
-    synchronized: pullRequestHandler,
+    synchronize: pullRequestHandler,
     closed: pullRequestMergeHandler,
   },
   push: pushHandler,
