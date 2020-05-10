@@ -1,0 +1,23 @@
+diff --git a/file.txt b/file.txt
+index 0d43cbb..4e652e9 100644
+--- a/file.txt
++++ b/file.txt
+@@ -4,21 +4,22 @@
++ /**
++  * @todo This is a todo with some
++  *       multi-line text.
++  * @todo This is another todo that has some
++  *       text.
++  */
++ var someVariable = 0;
+diff --git a/file.txt b/file.txt
+index 0d43cbb..4e652e9 100644
+--- a/file.txt
++++ b/file.txt
+@@ -4,21 +4,22 @@
++ // TODO this is a todo with some multi-line
++ //      text.
++ // @param Some param.
++ //        with additional text.
++ // @todo Another todo that has some text.
++ var anotherVariable = 1;

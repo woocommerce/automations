@@ -17,11 +17,18 @@
     "url": "https://github.com/nerrad/automations/issues"
   },
   "main": "lib/index.js",
+  "scripts": {
+    "build": "ncc build lib/index.js",
+    "test:coverage": "jest --coverage",
+    "test": "jest"
+  },
   "dependencies": {
     "@actions/core": "^1.2.4",
     "@actions/github": "^2.1.1",
     "hbs": "^4.1.1",
-    "leasot": "^10.3.0",
     "parse-diff": "^0.7.0"
+  },
+  "devDependencies": {
+    "jest": "^26.0.1"
   }
 }

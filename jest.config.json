@@ -1,0 +1,19 @@
+{
+  "rootDir": "./",
+  "collectCoverageFrom": ["lib/**/*.js", "!**/node_modules/**", "!**/tests/**"],
+  "modulePathIgnorePatterns": [
+    "<rootDir>/tests/fixtures/",
+    "<rootDir>/tests/helpers.js",
+    "<rootDir>/tests/setup.js"
+  ],
+  "setupFiles": ["<rootDir>/tests/setup.js"],
+  "moduleNameMapper": {
+    "@testFixtures(.*)$": "<rootDir>/tests/fixtures/$1",
+    "@testHelpers": "<rootDir>/tests/helpers.js"
+  },
+  "testMatch": [
+    "**/__tests__/**/*.[jt]s",
+    "**/test/*.[jt]s",
+    "**/?(*.)test.[jt]s"
+  ]
+}
