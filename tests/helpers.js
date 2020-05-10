@@ -1,6 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-const plugin = require("..");
 
 const loadDiff = (exports.loadDiff = (filename) => {
   return Promise.resolve({
