@@ -2579,6 +2579,7 @@ module.exports = async (context, octokit) => {
         fileName,
         keyword,
         number,
+        title,
         body: content,
       });
       body = lineBreak(body);
@@ -8063,6 +8064,7 @@ function addHook (state, kind, name, hook) {
 module.exports = `## {{ title }}
 {{#if body}}
 {{ body }}
+
 ---
 {{/if}}
 {{#if range}}
@@ -11220,6 +11222,7 @@ module.exports = async (context, octokit) => {
       }
       let body = comment({
         ...context.repo,
+        title,
         body: content,
         sha,
         username: `cc @${username}`,
@@ -26794,6 +26797,7 @@ module.exports = async (context, octokit) => {
           filename,
           keyword,
           body: content,
+          title,
         })
       );
 
