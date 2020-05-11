@@ -75,3 +75,8 @@ exports.gimmeOctokit = () => {
     },
   };
 };
+
+exports.gimmeApp = (appType) => {
+  const app = require(`../lib/automations/${appType}`);
+  return app.runner;
+};
