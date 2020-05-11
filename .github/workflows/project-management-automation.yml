@@ -2,6 +2,8 @@ on:
   pull_request:
     types: [opened,synchronize,closed]
   push:
+  issues:
+    types: [edited]
 name: Project management automations
 
 jobs:
