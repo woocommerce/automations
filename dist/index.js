@@ -3815,11 +3815,12 @@ const runner = async (context, octokit) => {
   const task = getRunnerTask(context.eventName, context.payload.action);
   if (typeof task === "function") {
     debug(`todoRunner: Executing the ${task.name} task.`);
-    task(context, octokit);
+    await task(context, octokit);
+  } else {
+    setFailed(
+      `todoRunner: There is no configured task for the event = '${context.eventName}' and the payload action = '${context.payload.action}'`
+    );
   }
-  setFailed(
-    `todoRunner: There is no configured task for the event = '${context.eventName}' and the payload action = '${context.payload.action}'`
-  );
 };
 
 module.exports = runner;
@@ -11197,13 +11198,21 @@ module.exports = async (context, octokit) => {
    * @type {TodoItem[]}
    */
   const todos = await getTodos(context, octokit);
-
   if (!todos || !Array.isArray(todos)) {
     debug(`pullRequestHandler: No todos were found in the changeset.`);
     return;
   }
   todos.forEach(
-    ({ keyword, title, content, fileName, range, sha, username, number }) => {
+    async ({
+      keyword,
+      title,
+      content,
+      fileName,
+      range,
+      sha,
+      username,
+      number,
+    }) => {
       // Does PR already have a comment for this item?
       if (comments.some((comment) => comment.body.startsWith(`## ${title}`))) {
         debug(`Comment with title [${title}] already exists`);
@@ -11222,7 +11231,7 @@ module.exports = async (context, octokit) => {
       body = lineBreak(body);
       const { owner, repo } = context.repo;
       debug(`Creating comment [${title}] in [${owner}/${repo}#${number}]`);
-      octokit.issues.createComment({
+      await octokit.issues.createComment({
         ...context.repo,
         issue_number: pullNumber,
         body,
@@ -32186,7 +32195,15 @@ handlebars.registerHelper(
   () => "https://github.com/nerrad/automations"
 );
 
-const compile = (moduleName) => handlebars.compile(moduleName);
+const moduleMap = {
+  comment,
+  issue,
+  issueFromMerge,
+  titleChange,
+  reopenClosed,
+};
+
+const compile = (moduleName) => handlebars.compile(moduleMap[moduleName]);
 
 module.exports = {
   comment: compile("comment"),
