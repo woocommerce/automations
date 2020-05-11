@@ -3,8 +3,9 @@
 exports[`pull-request-handler comments on a pull request 1`] = `
 Array [
   Object {
-    "body": "##
+    "body": "## I am an example title
 I am an example title
+
 ---
 https://github.com/nerrad/tests/blob/1409a3f61a27fe80a7170026fd73eaa2108a0108/.travis.yml#L9-L15
 ---
