@@ -17,7 +17,7 @@ jobs:
       - uses: WordPress/gutenberg/packages/project-management-automation@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          automations: [ todos ]
+          automations: todos
 
 ```
 
