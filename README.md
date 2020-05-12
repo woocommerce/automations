@@ -1,7 +1,5 @@
 # Project management automation
 
-> **Note:** Currently this is experimental while I learn Github actions.
-
 This is a [GitHub Action](https://help.github.com/en/categories/automating-your-workflow-with-github-actions) which contains various automations to assist with project management in a Github repository:
 
 - `todos`: Parses for `@todo` or `@TODO` comments in code and adds as inline review comments for reviews on pull request, and creates issues for each one if they exist when a pull is merged.
