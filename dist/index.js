@@ -32301,6 +32301,7 @@ const debug = __webpack_require__(69);
  */
 module.exports = async (context, octokit) => {
   const { issue, changes, sender } = context.payload;
+  debug(`issueRenameHandler: context.actor = [${context.actor}]`);
   if (
     sender.login !== context.actor &&
     issue.user.login === context.actor &&
@@ -34351,9 +34352,15 @@ const automations = __webpack_require__(37);
  * @typedef {import('./typedefs').AutomationTaskRunner} AutomationTaskRunner
  */
 
-// @todo Need to add tests for the various submodules in here.
-// Testing a multiline todo comment
-// to see how this works.
+/**
+ * @todo The following still needs done:
+ *
+ * - tests for remaining handlers
+ * - add eslint config.
+ * - flesh out readme and docs for contributing new actions.
+ *
+ * That's it I think!
+ */
 
 (async function initialize() {
   const token = getInput("github_token");
