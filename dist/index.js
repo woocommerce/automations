@@ -32301,7 +32301,9 @@ const debug = __webpack_require__(69);
  */
 module.exports = async (context, octokit) => {
   const { issue, changes, sender } = context.payload;
-  debug(`issueRenameHandler: context.actor = [${context.actor}]`);
+  debug(
+    `issueRenameHandler: context.actor = [${context.actor}] issue.user.login = [${issue.user.login}]`
+  );
   if (
     sender.login !== context.actor &&
     issue.user.login === context.actor &&
