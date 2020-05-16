@@ -32295,6 +32295,8 @@ const debug = __webpack_require__(69);
  * @typedef {import('../../typedefs').TodoItem} TodoItem
  */
 
+const botName = "github-actions[bot]";
+
 /**
  * @param {GitHubContext} context
  * @param {GitHub} octokit
@@ -32305,8 +32307,8 @@ module.exports = async (context, octokit) => {
     `issueRenameHandler: context.actor = [${context.actor}] issue.user.login = [${issue.user.login}]`
   );
   if (
-    sender.login !== context.actor &&
-    issue.user.login === context.actor &&
+    sender.login !== botName &&
+    issue.user.login === botName &&
     changes.title
   ) {
     debug(
