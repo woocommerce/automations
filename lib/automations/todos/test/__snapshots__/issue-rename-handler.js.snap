@@ -11,7 +11,7 @@ Object {
 
 exports[`issue-rename-handler un-edits the issue title 2`] = `
 Object {
-  "body": ":rocket: Please do not change this issue title! **The todo action** uses it to prevent duplicate issues from being opened. If you think this is an error, please [open an issue](https://github.com/nerrad/automations/issues/new)!",
+  "body": ":rocket: Please do not change this issue title! **The todo action** uses it to prevent duplicate issues from being opened. If you think this is an error, please [open an issue](https://github.com/woocommerce/automations/issues/new)!",
   "issue_number": 35,
   "owner": "nerrad",
   "repo": "tests",
