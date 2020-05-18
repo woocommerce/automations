@@ -35,20 +35,20 @@ jobs:
 
 _None._
 
-### Contributing
+## Contributing
 
 This will be expanded, but for reference:
 
-#### Developing
+### Developing
 
 - Clone the repo and then `npm install`.
 
-#### Builds and releases
+### Builds and releases
 
 - All pushes to master will automatically build the `dist/index.js` file for the action (then commit and push to master). So no need to worry about builds.
 - For releases, make sure you update the examples in the `README.md` if releasing a major version, otherwise just create a release manually (in the future this may get automated for releases).
 
-#### Adding a new automation.
+### Adding a new automation.
 
 The design of this repository is setup so that automations can be their own discrete thing (eg. "todos") but still take advantage of various scaffolding and boilerplate when creating a new automation. The following is a rough list of steps to take to create and add a new automation:
 
