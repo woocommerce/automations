@@ -20,6 +20,9 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
     - run: npm ci
+    # run tests
+    - run: npm run test
+    # if tests pass then build.
     - run: npm run build
     - uses: stefanzweifel/git-auto-commit-action@v4
       with: 
