@@ -13,6 +13,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: master
-      - uses: nerrad/automations@master
+      - uses: ./
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
