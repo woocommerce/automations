@@ -33,6 +33,7 @@
 	"devDependencies": {
 		"@wordpress/eslint-plugin": "^6.0.0",
 		"@wordpress/scripts": "^9.1.0",
+		"@zeit/ncc": "^0.22.1",
 		"jest": "^26.0.1"
 	}
 }
