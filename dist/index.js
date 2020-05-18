@@ -562,7 +562,7 @@ handlebars.registerHelper(
 
 handlebars.registerHelper(
 	'todoUrl',
-	() => 'https://github.com/nerrad/automations'
+	() => 'https://github.com/woocommerce/automations'
 );
 
 const moduleMap = {
