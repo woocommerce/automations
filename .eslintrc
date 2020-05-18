@@ -1,0 +1,12 @@
+{
+	"extends": [ "plugin:@wordpress/eslint-plugin/recommended" ],
+	"env": {
+		"jest/globals": true
+	},
+	"rules": {
+		"@wordpress/dependency-group": "off",
+		"valid-jsdoc": "off",
+		"radix": "error",
+		"yoda": [ "error", "never" ]
+	}
+}

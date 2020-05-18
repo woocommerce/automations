@@ -1,34 +1,38 @@
 {
-  "name": "@nerrad/automations",
-  "version": "1.0.0",
-  "description": "GitHub Action that implements various automations.",
-  "author": "Darren Ethier",
-  "license": "MIT",
-  "keywords": [
-    "github",
-    "actions"
-  ],
-  "homepage": "https://github.com/nerrad/automations/tree/master/README.md",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/nerrad/automations.git"
-  },
-  "bugs": {
-    "url": "https://github.com/nerrad/automations/issues"
-  },
-  "main": "lib/index.js",
-  "scripts": {
-    "build": "ncc build lib/index.js",
-    "test:coverage": "jest --coverage",
-    "test": "jest"
-  },
-  "dependencies": {
-    "@actions/core": "^1.2.4",
-    "@actions/github": "^2.1.1",
-    "hbs": "^4.1.1",
-    "parse-diff": "^0.7.0"
-  },
-  "devDependencies": {
-    "jest": "^26.0.1"
-  }
+	"name": "@nerrad/automations",
+	"version": "1.0.0",
+	"description": "GitHub Action that implements various automations.",
+	"author": "Darren Ethier",
+	"license": "MIT",
+	"keywords": [
+		"github",
+		"actions"
+	],
+	"homepage": "https://github.com/nerrad/automations/tree/master/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/nerrad/automations.git"
+	},
+	"bugs": {
+		"url": "https://github.com/nerrad/automations/issues"
+	},
+	"main": "lib/index.js",
+	"scripts": {
+		"build": "ncc build lib/index.js",
+		"test:coverage": "jest --coverage",
+		"test": "jest",
+		"lint": "wp-scripts lint-js ./lib ./tests",
+		"lint:fix": "wp-scripts lint-js ./lib ./tests --fix"
+	},
+	"dependencies": {
+		"@actions/core": "^1.2.4",
+		"@actions/github": "^2.1.1",
+		"hbs": "^4.1.1",
+		"parse-diff": "^0.7.0"
+	},
+	"devDependencies": {
+		"@wordpress/eslint-plugin": "^6.0.0",
+		"@wordpress/scripts": "^9.1.0",
+		"jest": "^26.0.1"
+	}
 }

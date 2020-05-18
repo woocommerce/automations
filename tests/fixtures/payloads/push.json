@@ -16,8 +16,8 @@
       "timestamp": "2018-02-17T18:47:11-05:00",
       "url": "https://github.com/nerrad/tests/commit/e06c237a0c041f5a0a61f1c361f7a1d6f3d669af",
       "author": {
-        "name": "Jason Etcovitch",
-        "email": "nerrad@roughsmootheng.in",
+        "name": "Darren Ethier",
+        "email": "darren@roughsmootheng.in",
         "username": "nerrad"
       },
       "committer": {
@@ -38,8 +38,8 @@
     "timestamp": "2018-02-17T18:47:11-05:00",
     "url": "https://github.com/nerrad/tests/commit/e06c237a0c041f5a0a61f1c361f7a1d6f3d669af",
     "author": {
-      "name": "Jason Etcovitch",
-      "email": "nerrad@roughsmootheng.in",
+      "name": "Darren Ethier",
+      "email": "darren@roughsmootheng.in",
       "username": "nerrad"
     },
     "committer": {
@@ -57,7 +57,7 @@
     "full_name": "nerrad/tests",
     "owner": {
       "name": "nerrad",
-      "email": "nerrad@roughsmootheng.in",
+      "email": "darren@roughsmootheng.in",
       "login": "nerrad",
       "id": 10660468,
       "avatar_url": "https://avatars1.githubusercontent.com/u/1429108?s=460&v=4",
@@ -148,7 +148,7 @@
   },
   "pusher": {
     "name": "nerrad",
-    "email": "nerrad@roughsmootheng.in"
+    "email": "darren@roughsmootheng.in"
   },
   "sender": {
     "login": "nerrad",

@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`issue-rename-handler un-edits the issue title 1`] = `
+Object {
+  "issue_number": 35,
+  "owner": "nerrad",
+  "repo": "tests",
+  "title": "I have been edited",
+}
+`;
+
+exports[`issue-rename-handler un-edits the issue title 2`] = `
+Object {
+  "body": ":rocket: Please do not change this issue title! **The todo action** uses it to prevent duplicate issues from being opened. If you think this is an error, please [open an issue](https://github.com/nerrad/automations/issues/new)!",
+  "issue_number": 35,
+  "owner": "nerrad",
+  "repo": "tests",
+}
+`;
