@@ -16,7 +16,7 @@ jobs:
   pull-request-automation:
     runs-on: ubuntu-latest
     steps:
-      - uses: woocommerce/automations@v1
+      - uses: woocommerce/automations@v1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           # This can be a comma delimited list of automations to run, in this case we're just executing todos
