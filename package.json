@@ -1,5 +1,5 @@
 {
-	"name": "@nerrad/automations",
+	"name": "@woocommerce/automations",
 	"version": "1.0.0",
 	"description": "GitHub Action that implements various automations.",
 	"author": "Darren Ethier",
@@ -8,13 +8,13 @@
 		"github",
 		"actions"
 	],
-	"homepage": "https://github.com/nerrad/automations/tree/master/README.md",
+	"homepage": "https://github.com/woocommerce/automations/tree/master/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/nerrad/automations.git"
+		"url": "https://github.com/woocommerce/automations.git"
 	},
 	"bugs": {
-		"url": "https://github.com/nerrad/automations/issues"
+		"url": "https://github.com/woocommerce/automations/issues"
 	},
 	"main": "lib/index.js",
 	"scripts": {
