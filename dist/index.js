@@ -35887,7 +35887,7 @@ const runner = __webpack_require__( 90 );
 module.exports = {
 	name: 'todos',
 	events: [ 'pull_request', 'push', 'issues' ],
-	actions: [ 'opened', 'closed', 'edited' ],
+	actions: [ 'opened', 'synchronize', 'closed', 'edited' ],
 	runner,
 };
 
