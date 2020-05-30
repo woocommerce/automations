@@ -67,8 +67,8 @@ module.exports = {
   runner
 }
 ```
-- As noted above, this export must include a `runner` for your automation. The runner is an async function that will receive two arguments: `context` (which is the GitHub action context value) and `octokit` (which is the GitHub api helper). See more about these two arguments [here](https://github.com/actions/toolkit/tree/master/packages/github) (they are essentially what gets exposed by the `@actions/github` package). You can use the [`todos` runner as an example](https://github.com/nerrad/automations/blob/master/lib/automations/todos/runner.js).
-- Finally, in [`lib/automations.js`](https://github.com/nerrad/automations/blob/master/lib/automations.js), makes sure you import your automation configuration into this file and add it to the `moduleNames` array. So for example, if your automation was setup in `lib/automations/my-automation`, you would have something like this in the file after your changes:
+- As noted above, this export must include a `runner` for your automation. The runner is an async function that will receive two arguments: `context` (which is the GitHub action context value) and `octokit` (which is the GitHub api helper). See more about these two arguments [here](https://github.com/actions/toolkit/tree/master/packages/github) (they are essentially what gets exposed by the `@actions/github` package). You can use the [`todos` runner as an example](https://github.com/woocommerce/automations/blob/master/lib/automations/todos/runner.js).
+- Finally, in [`lib/automations.js`](https://github.com/woocommerce/automations/automations/blob/master/lib/automations.js), makes sure you import your automation configuration into this file and add it to the `moduleNames` array. So for example, if your automation was setup in `lib/automations/my-automation`, you would have something like this in the file after your changes:
 
 ```js
   
