@@ -13063,10 +13063,6 @@ module.exports = exports['default'];
 /***/ 501:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
-const todos = __webpack_require__( 992 );
-
-const moduleNames = [ todos ];
-
 /**
  * @typedef {import('./typedefs').AutomationTask} AutomationTask
  */
@@ -13074,9 +13070,7 @@ const moduleNames = [ todos ];
 /**
  * @type {AutomationTask[]}
  */
-const automations = moduleNames.map( ( module ) => module );
-
-module.exports = automations;
+module.exports = [ __webpack_require__( 992 ) ];
 
 
 /***/ }),
