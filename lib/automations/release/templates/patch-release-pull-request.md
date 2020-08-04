@@ -43,12 +43,9 @@ _Link to any special instructions or helpful notes for HE related to this releas
 
 ## Quality
 
-
 > This section is for any notes related to quality around the release Please include any extra details with each item as needed. This can include notes about why something isn't checked or expanding info on your response to an item.
 
-
-
-**For testing:** {{#if zipLink}}[![Download Link](https://img.shields.io/badge/Download%20Zip-blueviolet.svg?style=flat)]({{zipLink}}){{else}}_There was a problem generating the zip_{{/if}}
+**For testing:**
 
 * [ ] Changes in this release are covered by Automated Tests.
 
