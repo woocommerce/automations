@@ -1,4 +1,5 @@
 {
+	"labelTypePrefix": "type: ",
 	"labelTypeMap": {
 		"bug": "Bug Fixes",
 		"regression": "Bug Fixes",
@@ -26,7 +27,6 @@
 		"config": "configuration",
 		"docs": "documentation"
 	},
-	"labelTypePrefix": "type: ",
 	"needsDevNoteLabel": "status:needs-dev-note",
 	"labelsToOmit": [
 		"skip-changelog"

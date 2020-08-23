@@ -4,7 +4,10 @@ This is a [GitHub Action](https://help.github.com/en/categories/automating-your-
 
 ## Available Automations
 
-- `todos`: Parses for `@todo` or `@TODO` comments in code and adds as inline review comments for reviews on pull request, and creates issues for each one if they exist when a pull is merged.
+| Automation | Description |
+| ---- | --------------|
+| [todos](./lib/automations/todos/README.md) | This automation parses for `@todo` or `@TODO` comments in code and adds formatted pull request comments for each todo found. When a pull request is merged to the main branch, issues will be created for each `@todo` in the diff if there is not already an issue for that todo. |
+| [release](./lib/automations/release/README.md) | This automation handles automating various parts of a somewhat opinionated release process.
 
 ## Installation and Usage
 
@@ -21,7 +24,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           # This can be a comma delimited list of automations to run, in this case we're just executing todos
           automations: todos
-
 ```
 
 ## API
@@ -71,7 +73,7 @@ module.exports = {
 - Finally, in [`lib/automations.js`](https://github.com/woocommerce/automations/automations/blob/master/lib/automations.js), makes sure you import your automation configuration into this file and add it to the `moduleNames` array. So for example, if your automation was setup in `lib/automations/my-automation`, you would have something like this in the file after your changes:
 
 ```js
-  
+
 const todos = require( './automations/todos' );
 const myAutomation = require( './automations/my-automation' );
 

@@ -48,7 +48,7 @@ _Link to any special instructions or helpful notes for HE related to this releas
 
 
 
-**For testing:** {{#if zipLink}}[![Download Link](https://img.shields.io/badge/Download%20Zip-blueviolet.svg?style=flat)]({{zipLink}}){{else}}_There was a problem generating the zip_{{/if}}
+**For testing:**
 
 * [ ] Changes in this release are covered by Automated Tests.
 
