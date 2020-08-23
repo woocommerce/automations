@@ -96,6 +96,7 @@ exports.gimmeOctokit = () => {
 			getContents: jest
 				.fn( () => Promise.resolve( { content: '' } ) )
 				.mockName( 'repos.getContents' ),
+			getBranch: jest.fn().mockName( 'repos.getBranch' ),
 		},
 		pulls: {
 			get: jest.fn( () => loadDiff( 'basic' ) ).mockName( 'pulls.get' ),
