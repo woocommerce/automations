@@ -1094,7 +1094,6 @@ const { getConfig } = __webpack_require__( 439 );
 module.exports = {
 	name: 'release',
 	events: [ 'create' ],
-	actions: [],
 	runner,
 	getConfig,
 };
