@@ -1469,6 +1469,25 @@ exports.SourceNode = __webpack_require__(54).SourceNode;
 
 /***/ }),
 
+/***/ 95:
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+/**
+ * Internal dependencies
+ */
+const { getMilestoneByTitle, getIssuesByMilestone } = __webpack_require__( 770 );
+const { lineBreak, truncate } = __webpack_require__( 720 );
+
+module.exports = {
+	getMilestoneByTitle,
+	getIssuesByMilestone,
+	lineBreak,
+	truncate,
+};
+
+
+/***/ }),
+
 /***/ 106:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
@@ -3406,23 +3425,6 @@ module.exports = opts => {
 	}
 
 	return result;
-};
-
-
-/***/ }),
-
-/***/ 170:
-/***/ (function(__unusedmodule, exports) {
-
-exports.lineBreak = ( body ) => {
-	// Regular expression to match all occurences of '&lt;br&gt'
-	const regEx = /\/?&lt;br(?:\s\/)?&gt;/g;
-	return body.replace( regEx, '<br>' );
-};
-
-exports.truncate = ( str, maxLength = 80 ) => {
-	if ( str.length < maxLength ) return str;
-	return str.substring( 0, maxLength ) + '...';
 };
 
 
@@ -13292,7 +13294,7 @@ const {
 	duplicateChecker: checkForDuplicateIssue,
 } = __webpack_require__( 995 );
 const reopenClosed = __webpack_require__( 89 );
-const { lineBreak, truncate } = __webpack_require__( 170 );
+const { lineBreak, truncate } = __webpack_require__( 95 );
 const { issueFromMerge } = __webpack_require__( 44 );
 const getTodos = __webpack_require__( 557 );
 const debug = __webpack_require__( 270 );
@@ -13478,7 +13480,7 @@ const automations = __webpack_require__( 501 );
 		`initialize: Received event = '${ context.eventName }', action = '${ context.payload.action }'`
 	);
 
-	for ( const { name, events, actions, runner } of automations ) {
+	for ( const { name, events, actions, runner, getConfig } of automations ) {
 		if (
 			events.includes( context.eventName ) &&
 			( actions === undefined ||
@@ -13490,7 +13492,8 @@ const automations = __webpack_require__( 501 );
 				 * @type {AutomationTaskRunner}
 				 */
 				const task = ifNotFork( runner );
-				await task( context, octokit );
+				const config = await getConfig( context, octokit );
+				await task( context, octokit, config );
 			} catch ( error ) {
 				setFailed(
 					`initialize: Runner ${ name } failed with error: ${ error }`
@@ -16268,7 +16271,7 @@ module.exports = function btoa(str) {
 const {
 	duplicateChecker: checkForDuplicateIssue,
 } = __webpack_require__( 995 );
-const { lineBreak, truncate } = __webpack_require__( 170 );
+const { lineBreak, truncate } = __webpack_require__( 95 );
 const reopenClosed = __webpack_require__( 89 );
 const { issue } = __webpack_require__( 44 );
 const getTodos = __webpack_require__( 557 );
@@ -16463,6 +16466,23 @@ module.exports = (promise, onFinally) => {
 			throw err;
 		})
 	);
+};
+
+
+/***/ }),
+
+/***/ 720:
+/***/ (function(__unusedmodule, exports) {
+
+exports.lineBreak = ( body ) => {
+	// Regular expression to match all occurences of '&lt;br&gt'
+	const regEx = /\/?&lt;br(?:\s\/)?&gt;/g;
+	return body.replace( regEx, '<br>' );
+};
+
+exports.truncate = ( str, maxLength = 80 ) => {
+	if ( str.length < maxLength ) return str;
+	return str.substring( 0, maxLength ) + '...';
 };
 
 
@@ -17531,6 +17551,92 @@ module.exports = function (x) {
 	}
 
 	return x;
+};
+
+
+/***/ }),
+
+/***/ 770:
+/***/ (function(module) {
+
+/**
+ * @typedef {import('../typedefs').GitHubContext} GitHubContext
+ * @typedef {import('../typedefs').GitHub} GitHub
+ * @typedef {import('../typedefs').IssuesListForRepoResponseItem} IssuesListForRepoResponseItem
+ * @typedef {import('../typedefs').IssuesListMilestonesForRepoResponseItem} IssuesListMilestonesForRepoResponseItem
+ * @typedef {import('../typedefs').IssueState} IssueState
+ */
+
+/**
+ * Returns a promise resolving to a milestone by a given title, if exists.
+ *
+ * @param {GitHubContext} context
+ * @param {GitHub} octokit Initialized Octokit REST client.
+ * @param {string} title   Milestone title.
+ * @param {IssueState} state
+ * @return {Promise<IssuesListMilestonesForRepoResponseItem|void>} Promise resolving to milestone, if exists.
+ */
+async function getMilestoneByTitle( context, octokit, title, state = 'open' ) {
+	const options = octokit.issues.listMilestonesForRepo.endpoint.merge( {
+		...context.repo,
+		state,
+	} );
+
+	/**
+	 * @type {AsyncIterableIterator<import('@octokit/rest').Response<import('@octokit/rest').IssuesListMilestonesForRepoResponse>>}
+	 */
+	const responses = octokit.paginate.iterator( options );
+
+	for await ( const response of responses ) {
+		const milestones = response.data;
+		for ( const milestone of milestones ) {
+			if (
+				milestone.title === title ||
+				milestone.title === `${ title }.0`
+			) {
+				return milestone;
+			}
+		}
+	}
+}
+
+/**
+ * Returns a promise resolving to pull requests by a given milestone ID.
+ *
+ * @param {GitHubContext} context
+ * @param {GitHub}     octokit   Initialized Octokit REST client.
+ * @param {number}     milestone Milestone ID.
+ * @param {IssueState} [state]   Optional issue state.
+ *
+ * @return {Promise<IssuesListForRepoResponseItem[]>} Promise resolving to pull
+ *                                                    requests for the given
+ *                                                    milestone.
+ */
+async function getIssuesByMilestone( context, octokit, milestone, state ) {
+	const options = octokit.issues.listForRepo.endpoint.merge( {
+		...context.repo,
+		milestone,
+		state,
+	} );
+
+	/**
+	 * @type {AsyncIterableIterator<import('@octokit/rest').Response<import('@octokit/rest').IssuesListForRepoResponse>>}
+	 */
+	const responses = octokit.paginate.iterator( options );
+
+	const pulls = [];
+
+	for await ( const response of responses ) {
+		const issues = response.data;
+		pulls.push( ...issues );
+	}
+
+	return pulls;
+}
+
+module.exports = {
+	getMilestoneByTitle,
+	getIssuesByMilestone,
 };
 
 
@@ -35361,7 +35467,7 @@ exports.search = function search(aNeedle, aHaystack, aCompare, aBias) {
  * Internal dependencies
  */
 const { comment } = __webpack_require__( 44 );
-const { lineBreak } = __webpack_require__( 170 );
+const { lineBreak } = __webpack_require__( 95 );
 const getTodos = __webpack_require__( 557 );
 const debug = __webpack_require__( 270 );
 
