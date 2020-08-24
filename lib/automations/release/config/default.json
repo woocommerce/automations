@@ -1,0 +1,34 @@
+{
+	"labelTypePrefix": "type: ",
+	"labelTypeMap": {
+		"bug": "Bug Fixes",
+		"regression": "Bug Fixes",
+		"feature": "Features",
+		"enhancement": "Enhancements",
+		"new api": "New APIs",
+		"experimental": "Experiments",
+		"task": "Various"
+	},
+	"groupTitleOrder": [
+		"Features",
+		"Enhancements",
+		"New APIs",
+		"Bug Fixes",
+		"Performance",
+		"Experiments",
+		"Documentation",
+		"Code Quality",
+		"undefined",
+		"Various"
+	],
+	"rewordTerms": {
+		"e2e": "end-to-end",
+		"url": "URL",
+		"config": "configuration",
+		"docs": "documentation"
+	},
+	"needsDevNoteLabel": "status:needs-dev-note",
+	"labelsToOmit": [
+		"skip-changelog"
+	]
+}

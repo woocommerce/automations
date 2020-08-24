@@ -56,6 +56,26 @@ exports.gimmeOctokit = () => {
 			create: jest
 				.fn( ( data ) => Promise.resolve( { data } ) )
 				.mockName( 'issues.create' ),
+			listMilestonesForRepo: {
+				endpoint: {
+					merge: jest
+						.fn( () => ( {
+							type: 'list.milestones',
+						} ) )
+						.mockName(
+							'issues.listMilestonesForRepo.endpoint.merge'
+						),
+				},
+			},
+			listForRepo: {
+				endpoint: {
+					merge: jest
+						.fn( () => ( {
+							type: 'list.issues',
+						} ) )
+						.mockName( 'issues.listForRepo.endpoint.merge' ),
+				},
+			},
 		},
 		git: {
 			getCommit: jest
@@ -73,11 +93,50 @@ exports.gimmeOctokit = () => {
 			getCommit: jest
 				.fn( () => loadDiff( 'basic' ) )
 				.mockName( 'repos.getCommit' ),
+			getContents: jest
+				.fn( () => Promise.resolve( { content: '' } ) )
+				.mockName( 'repos.getContents' ),
+			getBranch: jest.fn().mockName( 'repos.getBranch' ),
 		},
 		pulls: {
 			get: jest.fn( () => loadDiff( 'basic' ) ).mockName( 'pulls.get' ),
+			create: jest
+				.fn( () => Promise.resolve( { number: 1235 } ) )
+				.mockName( 'pulls.create' ),
+		},
+		paginate: {
+			iterator: jest
+				.fn( ( options ) => {
+					switch ( options.type ) {
+						case 'list.milestones':
+							return mockedAsyncIterator( [
+								{ data: [ { title: '3.0.0', number: 1234 } ] },
+							] )();
+						case 'list.issues':
+							return mockedAsyncIterator( [
+								{
+									data: require( './fixtures/payloads/issues-list.json' ),
+								},
+							] )();
+					}
+					return mockedAsyncIterator( {} )();
+				} )
+				.mockName( 'paginate.iterator' ),
 		},
 	};
+};
+
+const mockedAsyncIterator = ( resolvedValue ) =>
+	async function* iterable() {
+		const values = await Promise.resolve( resolvedValue );
+		for ( const value of values ) {
+			yield value;
+		}
+	};
+
+exports.gimmeConfig = ( appType ) => {
+	const app = require( `../lib/automations/${ appType }` );
+	return app.getConfig();
 };
 
 exports.gimmeApp = ( appType ) => {
