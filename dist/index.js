@@ -26074,13 +26074,13 @@ module.exports = async ( patchVersion, context, octokit ) => {
 		branch: `release/${ releaseVersion }`,
 	} );
 	// if branch doesn't exist try the canonical `.0` version.
-	if ( branch.message ) {
+	if ( branch && branch.message ) {
 		branch = await octokit.repos.getBranch( {
 			...context.repo,
 			branch: `release/${ releaseVersion }.0`,
 		} );
 	}
-	return branch.message ? false : branch.name;
+	return branch && branch.name ? branch.name : false;
 };
 
 
@@ -32458,7 +32458,7 @@ const branchHandler = async ( context, octokit, config ) => {
 
 	// is this a patch release?
 	if ( isPatchRelease( releaseVersion ) ) {
-		base = getReleaseBranch( releaseVersion, context, octokit );
+		base = await getReleaseBranch( releaseVersion, context, octokit );
 		pullRequestTemplate = await getTemplate(
 			TEMPLATES.patchReleasePullRequest,
 			context,
