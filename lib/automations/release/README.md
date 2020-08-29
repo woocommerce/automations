@@ -4,7 +4,7 @@ This automation handles automating various parts of a somewhat opinionated relea
 
 Currently:
 
-- it reacts to the `create` (create branch) event.
+- it reacts to the `create` (create branch) event (which is triggered when you [create a branch using the GitHub UI](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-and-deleting-branches-within-your-repository#creating-a-branch)).
 - if a created branch has the format `release/x.x.x` where `x.x.x` is the version being released...
   - automation will check if there's already a pull request created for this release branch and if yes then stop here. Otherwise...
   - will create a pull request using `.github/release-pull-request.md` or `.github/patch-release-pull-request.md` templates found in the project's repo or falling back to the templates in this action.
@@ -16,12 +16,25 @@ Currently:
 To implement this action, include it in your workflow configuration file:
 
 ```yaml
+name: Release PUll Request Automation
 on:
   create:
 jobs:
   release-automation:
     runs-on: ubuntu-latest
     steps:
+      # This is needed to make sure the created branch has a changeset. Otherwise the pull request
+      # will not be created.
+      - uses: actions/checkout@v2
+        - run: |
+          date > .release-artifact
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "generating changeset for pull request"
+          rm .release-artifact
+          git commit -am "generating changeset for pull request"
+          git push
       - uses: woocommerce/automations@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
