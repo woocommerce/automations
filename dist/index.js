@@ -32570,8 +32570,6 @@ const branchHandler = async ( context, octokit, config ) => {
 		return;
 	}
 
-	core.debug( 'PR Created and response is:' + JSON.stringify( prCreated ) );
-
 	// Add initial Action checklist as comment.
 	const commentBody = lineBreak(
 		compile( initialChecklistTemplate )( templateData )
@@ -32579,7 +32577,7 @@ const branchHandler = async ( context, octokit, config ) => {
 
 	await octokit.issues.createComment( {
 		...context.repo,
-		issue_number: prCreated.number,
+		issue_number: prCreated.data.number,
 		body: commentBody,
 	} );
 };
