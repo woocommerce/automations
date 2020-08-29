@@ -31053,7 +31053,13 @@ const automations = __webpack_require__( 501 );
 		`initialize: Received event = '${ context.eventName }', action = '${ context.payload.action }'`
 	);
 
-	for ( const { name, events, actions, runner, getConfig } of automations ) {
+	for ( const {
+		name,
+		events,
+		actions,
+		runner,
+		getConfig = () => void null,
+	} of automations ) {
 		if (
 			events.includes( context.eventName ) &&
 			( actions === undefined ||
