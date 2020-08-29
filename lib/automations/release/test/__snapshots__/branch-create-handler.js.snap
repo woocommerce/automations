@@ -3,7 +3,7 @@
 exports[`branch-create-handler for release pull request generation Bails if there is no milestone for the given release branch 1`] = `
 Array [
   Object {
-    "base": false,
+    "base": "master",
     "body": "This is the release pull request for WooCommerce Blocks plugin 4.2.1.
 
 ## Communication
