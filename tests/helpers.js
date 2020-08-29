@@ -101,7 +101,7 @@ exports.gimmeOctokit = () => {
 		pulls: {
 			get: jest.fn( () => loadDiff( 'basic' ) ).mockName( 'pulls.get' ),
 			create: jest
-				.fn( () => Promise.resolve( { number: 1235 } ) )
+				.fn( () => Promise.resolve( { data: { number: 1235 } } ) )
 				.mockName( 'pulls.create' ),
 		},
 		paginate: {
