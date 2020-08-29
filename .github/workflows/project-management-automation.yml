@@ -4,7 +4,6 @@ on:
   push:
   issues:
     types: [edited]
-  create:
 name: Project management automations
 
 jobs:
