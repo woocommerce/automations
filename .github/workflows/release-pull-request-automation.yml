@@ -1,0 +1,26 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Release Pull Request Automation
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  create:
+jobs:
+  project-management-automation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          date > .release-artifact
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "generating changeset for pull request"
+          rm .release-artifact
+          git commit -am "generating changeset for pull request"
+          git push
+      - uses: ./
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          automations: release
