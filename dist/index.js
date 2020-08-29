@@ -32406,6 +32406,11 @@ function preparePartialBlock(open, program, close, locInfo) {
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
 /**
+ * External dependencies
+ */
+const core = __webpack_require__( 470 );
+
+/**
  * Internal dependencies
  */
 const { getTemplate, TEMPLATES, compile } = __webpack_require__( 177 );
@@ -32558,6 +32563,8 @@ const branchHandler = async ( context, octokit, config ) => {
 		debug( `releaseAutomation: Creation of pull request failed.` );
 		return;
 	}
+
+	core.debug( 'PR Created and response is:' + JSON.stringify( prCreated ) );
 
 	// Add initial Action checklist as comment.
 	const commentBody = lineBreak(
