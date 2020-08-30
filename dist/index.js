@@ -26095,7 +26095,7 @@ module.exports = async ( patchVersion, context, octokit ) => {
 		}
 	}
 
-	return branch && branch.name ? branch.name : false;
+	return branch && branch.data && branch.data.name ? branch.data.name : false;
 };
 
 
