@@ -1,0 +1,9 @@
+{
+	"labelsToOmit": [
+		"skip-changelog",
+		"status: duplicate",
+		"type: invalid",
+		"type: support",
+		"type: wontfix"
+	]
+}
