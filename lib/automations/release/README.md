@@ -16,7 +16,7 @@ Currently:
 To implement this action, include it in your workflow configuration file:
 
 ```yaml
-name: Release PUll Request Automation
+name: Release Pull Request Automation
 on:
   create:
 jobs:
