@@ -3568,7 +3568,7 @@ module.exports = {
 		}
 		return templateContents + templateObject.footer;
 	},
-	compile: ( contents ) => handlebars.compile( contents ),
+	compile: ( contents ) => handlebars.compile( contents, { noEscape: true } ),
 };
 
 
@@ -32539,11 +32539,11 @@ const branchHandler = async ( context, octokit, config ) => {
 		changelog =
 			`> Changelog Error: ${ e.message }` +
 			'\n' +
-			"You'll need to edit this section manually";
+			"> You'll need to edit this section manually";
 		devNoteItems =
 			`> Devnotes Error: ${ e.message }` +
 			'\n' +
-			"PRs tagged for dev notes cannot be found, you'll need to edit this section manually.";
+			"> PRs tagged for dev notes cannot be found, you'll need to edit this section manually.";
 	}
 
 	const templateData = {
