@@ -19,7 +19,7 @@ This release introduces:
 
 ### Changelog
 
-> Changelog Error: Cannot find milestone by title: 4.2.1
+> Changelog Error: Changelog could not be generated because there is no milestone for the release branch that was pushed. Double-check the spelling on the release branch and ensure that you have a milestone corresponding to the version in the branch name. If you found the error, you can restart by deleting the branch and this pull and pushing a new branch.
 > You'll need to edit this section manually
 
 ### Prepared Updates
@@ -34,7 +34,7 @@ The following documentation, blog posts, and changelog updates are prepared for 
 
 **Developer Notes** - The following issues require developer notes in the release post:
 
-> Devnotes Error: Cannot find milestone by title: 4.2.1
+> Devnotes Error: Changelog could not be generated because there is no milestone for the release branch that was pushed. Double-check the spelling on the release branch and ensure that you have a milestone corresponding to the version in the branch name. If you found the error, you can restart by deleting the branch and this pull and pushing a new branch.
 > PRs tagged for dev notes cannot be found, you'll need to edit this section manually.
 
 
