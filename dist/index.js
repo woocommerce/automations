@@ -7787,7 +7787,9 @@ function coerce (version) {
  */
 const debug = __webpack_require__( 270 );
 
-/** @typedef {import('./typedefs').AutomationTaskRunner} AutomationTaskRunner */
+/**
+ * @typedef {import('./typedefs').AutomationTaskRunner} AutomationTaskRunner
+ */
 
 /**
  * Higher-order function which executes and returns the result of the given
@@ -7798,18 +7800,17 @@ const debug = __webpack_require__( 270 );
  * pull_request property.
  *
  * @param {AutomationTaskRunner} runner Original runner.
- *
  * @return {AutomationTaskRunner} Enhanced task.
  */
 function ifNotFork( runner ) {
 	/** @type {AutomationTaskRunner} */
-	const newRunner = ( payload, octokit ) => {
+	const newRunner = ( payload, octokit, config ) => {
 		if (
 			! payload.pull_request ||
 			payload.pull_request.head.repo.full_name ===
 				payload.pull_request.base.repo.full_name
 		) {
-			return runner( payload, octokit );
+			return runner( payload, octokit, config );
 		}
 		debug( `main: Skipping ${ runner.name } because we are in a fork.` );
 	};
@@ -27762,12 +27763,11 @@ module.exports = {
 	 */
 	getConfig: async ( context, octokit ) => {
 		let repoConfig = {};
-		const configFileName = 'release-automation-config.json';
 		// check if config file exists on GitHub repo.
 		try {
 			const response = octokit.repos.getContents( {
 				...context.repo,
-				path: `.github/${ configFileName }`,
+				path: '.github/release-automation-config.json',
 			} );
 			core.debug( 'response: ' + JSON.stringify( response ) );
 			if (
@@ -27783,7 +27783,7 @@ module.exports = {
 			}
 		} catch ( e ) {
 			debug(
-				`releaseRunner: Error retrieving the ${ configFileName } release config from the repository.`
+				`releaseRunner: Error retrieving the release-automation-config.json release config from the repository.`
 			);
 		}
 
