@@ -27746,6 +27746,11 @@ const defaultConfig = __webpack_require__( 232 );
 const { validateConfig } = __webpack_require__( 472 );
 
 /**
+ * External dependencies
+ */
+const core = __webpack_require__( 470 );
+
+/**
  * @typedef {import('../../../typedefs').GitHub} GitHub
  * @typedef {import('../../../typedefs').GitHubContext} GitHubContext
  */
@@ -27764,10 +27769,14 @@ module.exports = {
 				...context.repo,
 				path: `.github/${ configFileName }`,
 			} );
-			if ( response.content && response.encoding ) {
-				const buffer = new Buffer(
-					response.content,
-					response.encoding
+			if (
+				response.data &&
+				response.data.content &&
+				response.data.encoding
+			) {
+				const buffer = Buffer.from(
+					response.data.content,
+					response.data.encoding
 				);
 				repoConfig = JSON.parse( buffer.toString( 'utf-8' ) );
 			}
@@ -27776,6 +27785,8 @@ module.exports = {
 				`releaseRunner: Error retrieving the ${ configFileName } release config from the repository.`
 			);
 		}
+
+		core.debug( 'retrieved config' + JSON.stringify( repoConfig ) );
 
 		// validate config.
 		validateConfig( repoConfig );
@@ -31022,7 +31033,7 @@ module.exports.Collection = Hook.Collection
 /**
  * External dependencies
  */
-const { setFailed, getInput } = __webpack_require__( 470 );
+const { setFailed, getInput, debug: coreDebug } = __webpack_require__( 470 );
 const { context, GitHub } = __webpack_require__( 469 );
 
 /**
@@ -31078,6 +31089,7 @@ const automations = __webpack_require__( 501 );
 				 */
 				const task = ifNotFork( runner );
 				const config = await getConfig( context, octokit );
+				coreDebug( 'Created config' + JSON.stringify( config ) );
 				await task( context, octokit, config );
 			} catch ( error ) {
 				setFailed(
