@@ -35360,7 +35360,12 @@ module.exports = function (x) {
 /***/ }),
 
 /***/ 770:
-/***/ (function(module) {
+/***/ (function(module, __unusedexports, __webpack_require__) {
+
+/**
+ * External dependencies
+ */
+const core = __webpack_require__( 470 );
 
 /**
  * @typedef {import('../typedefs').GitHubContext} GitHubContext
@@ -35373,7 +35378,7 @@ module.exports = function (x) {
 /**
  * Returns an array of version possibilities to check
  *
- * @param {string} version
+ * @param {Array} version
  */
 function getVersionsToCheck( version ) {
 	const versionSplit = version.split( '.' );
@@ -35416,6 +35421,11 @@ async function getMilestoneByTitle( context, octokit, title, state = 'open' ) {
 	const responses = octokit.paginate.iterator( options );
 
 	const versionsToCheck = getVersionsToCheck( title );
+
+	core.debug(
+		'Versions being checked for milestone:' +
+			JSON.stringify( versionsToCheck )
+	);
 
 	for await ( const response of responses ) {
 		const milestones = response.data;
@@ -53191,7 +53201,15 @@ module.exports = options => {
 /***/ 967:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
+/**
+ * Internal dependencies
+ */
 const { getMilestoneByTitle } = __webpack_require__( 95 );
+
+/**
+ * External dependencies
+ */
+const core = __webpack_require__( 470 );
 
 /**
  * @typedef {import('../../../typedefs').GitHubContext} GitHubContext
@@ -53210,6 +53228,7 @@ const { getMilestoneByTitle } = __webpack_require__( 95 );
  */
 module.exports = async ( version, context, octokit, state = 'open' ) => {
 	const milestone = getMilestoneByTitle( context, octokit, version, state );
+	core.debug( `Milestone retrieved: ${ milestone }` );
 	return !! milestone;
 };
 
