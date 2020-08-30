@@ -32531,11 +32531,11 @@ const branchHandler = async ( context, octokit, config ) => {
 		// Currently, the changelog error is a consistent error message string
 		// so that future pushes where the pull already exists can optionally retry.
 		changelog =
-			`Changelog Error: ${ e.message }` +
+			`> Changelog Error: ${ e.message }` +
 			'\n' +
 			"You'll need to edit this section manually";
 		devNoteItems =
-			`Devnotes Error: ${ e.message }` +
+			`> Devnotes Error: ${ e.message }` +
 			'\n' +
 			"PRs tagged for dev notes cannot be found, you'll need to edit this section manually.";
 	}
