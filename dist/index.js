@@ -27769,6 +27769,7 @@ module.exports = {
 				...context.repo,
 				path: `.github/${ configFileName }`,
 			} );
+			core.debug( 'response: ' + JSON.stringify( response ) );
 			if (
 				response.data &&
 				response.data.content &&
@@ -27786,7 +27787,7 @@ module.exports = {
 			);
 		}
 
-		core.debug( 'retrieved config' + JSON.stringify( repoConfig ) );
+		core.debug( 'retrieved config: ' + JSON.stringify( repoConfig ) );
 
 		// validate config.
 		validateConfig( repoConfig );
@@ -31089,7 +31090,9 @@ const automations = __webpack_require__( 501 );
 				 */
 				const task = ifNotFork( runner );
 				const config = await getConfig( context, octokit );
-				coreDebug( 'Created config' + JSON.stringify( config ) );
+				coreDebug(
+					`Created config: ${ config } : ` + JSON.stringify( config )
+				);
 				await task( context, octokit, config );
 			} catch ( error ) {
 				setFailed(
@@ -32465,6 +32468,9 @@ const {
  * @param {ReleaseConfig} config
  */
 const branchHandler = async ( context, octokit, config ) => {
+	core.debug(
+		'Received config in branchHandler: ' + JSON.stringify( config )
+	);
 	// get release version.
 	const releaseVersion = getReleaseVersion( context.payload );
 	if ( ! releaseVersion ) {
@@ -32609,6 +32615,7 @@ const branchHandler = async ( context, octokit, config ) => {
  */
 module.exports = async ( context, octokit, config ) => {
 	const type = context.payload.ref_type;
+	core.debug( 'Received config in runner: ' + JSON.stringify( config ) );
 	let handler;
 	switch ( type ) {
 		case 'branch':
@@ -50948,7 +50955,7 @@ module.exports = function (str) {
  * External dependencies
  */
 const debug = __webpack_require__( 270 );
-const { setFailed } = __webpack_require__( 470 );
+const { setFailed, debug: coreDebug } = __webpack_require__( 470 );
 
 /**
  * Internal dependencies
@@ -50994,6 +51001,7 @@ const getRunnerTask = ( eventName, action ) => {
  */
 const runner = async ( context, octokit, config ) => {
 	const task = getRunnerTask( context.eventName, context.payload.action );
+	coreDebug( 'Received config: ' + JSON.stringify( config ) );
 	if ( typeof task === 'function' ) {
 		debug( `releaseRunner: Executing the ${ task.name } task.` );
 		await task( context, octokit, config );
@@ -53517,6 +53525,7 @@ module.exports = async ( context, octokit ) => {
  * External dependencies
  */
 const { groupBy, escapeRegExp, uniq } = __webpack_require__( 288 );
+const core = __webpack_require__( 470 );
 
 /**
  * Internal dependencies
@@ -53558,6 +53567,9 @@ const TITLE_TYPE_PATTERNS = new Map( [
  * @return {string[]} Type candidates.
  */
 function getTypesByLabels( labels, config ) {
+	core.debug(
+		'Received config in getTypesByLabels:' + JSON.stringify( config )
+	);
 	const prefix = config.labelTypePrefix;
 	const labelTypeMap = config.labelTypeMap;
 	return uniq(
@@ -53599,6 +53611,9 @@ function getTypesByTitle( title ) {
  * @return {function(IssuesListForRepoResponseItem)} Type label.
  */
 function getIssueType( config ) {
+	core.debug(
+		'Received config in getIssueType: ' + JSON.stringify( config )
+	);
 	/**
 	 * @param {IssuesListForRepoResponseItem} issue Issue object.
 	 *
@@ -53896,6 +53911,7 @@ async function fetchAllPullRequests( context, octokit, milestoneTitle ) {
  * @return {Promise<string>} Promise resolving to changelog.
  */
 async function getChangelogItems( context, octokit, milestoneTitle, config ) {
+	core.debug( 'Config in getChangelogItems' + JSON.stringify( config ) );
 	const pullRequests = await fetchAllPullRequests(
 		context,
 		octokit,
