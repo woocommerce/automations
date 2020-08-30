@@ -35385,13 +35385,13 @@ function getVersionsToCheck( version ) {
 	switch ( versionSplit.length ) {
 		case 3:
 			// patch version
-			if ( versionSplit[ 2 ] !== 0 ) {
+			if ( versionSplit[ 2 ] !== '0' ) {
 				return [ version ];
 			}
 			return [ version, `${ versionSplit[ 0 ] }.${ versionSplit[ 1 ] }` ];
 		case 2:
 			// minor version
-			if ( versionSplit[ 1 ] !== 0 ) {
+			if ( versionSplit[ 1 ] !== '0' ) {
 				return [ version, `${ version }.0` ];
 			}
 			return [ version, `${ versionSplit[ 0 ] }`, `${ version }.0` ];
@@ -53227,7 +53227,12 @@ const core = __webpack_require__( 470 );
  * @return {boolean} True if there is a milestone.
  */
 module.exports = async ( version, context, octokit, state = 'open' ) => {
-	const milestone = getMilestoneByTitle( context, octokit, version, state );
+	const milestone = await getMilestoneByTitle(
+		context,
+		octokit,
+		version,
+		state
+	);
 	core.debug( `Milestone retrieved: ${ milestone }` );
 	return !! milestone;
 };
