@@ -35371,6 +35371,31 @@ module.exports = function (x) {
  */
 
 /**
+ * Returns an array of version possibilities to check
+ *
+ * @param {string} version
+ */
+function getVersionsToCheck( version ) {
+	const versionSplit = version.split( '.' );
+	switch ( versionSplit.length ) {
+		case 3:
+			// patch version
+			if ( versionSplit[ 2 ] !== 0 ) {
+				return [ version ];
+			}
+			return [ version, `${ versionSplit[ 0 ] }.${ versionSplit[ 1 ] }` ];
+		case 2:
+			// minor version
+			if ( versionSplit[ 1 ] !== 0 ) {
+				return [ version, `${ version }.0` ];
+			}
+			return [ version, `${ versionSplit[ 0 ] }`, `${ version }.0` ];
+		default:
+			return [ version, `${ version }.0`, `${ version }.0.0` ];
+	}
+}
+
+/**
  * Returns a promise resolving to a milestone by a given title, if exists.
  *
  * @param {GitHubContext} context
@@ -35390,13 +35415,12 @@ async function getMilestoneByTitle( context, octokit, title, state = 'open' ) {
 	 */
 	const responses = octokit.paginate.iterator( options );
 
+	const versionsToCheck = getVersionsToCheck( title );
+
 	for await ( const response of responses ) {
 		const milestones = response.data;
 		for ( const milestone of milestones ) {
-			if (
-				milestone.title === title ||
-				milestone.title === `${ title }.0`
-			) {
+			if ( versionsToCheck.includes( milestone.title ) ) {
 				return milestone;
 			}
 		}
