@@ -21,6 +21,7 @@ on:
   create:
 jobs:
   release-automation:
+    if: ${{ github.event.ref_type == 'branch' }}
     runs-on: ubuntu-latest
     steps:
       # This is needed to make sure the created branch has a changeset. Otherwise the pull request
