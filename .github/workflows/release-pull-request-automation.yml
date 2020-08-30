@@ -6,11 +6,11 @@ name: Release Pull Request Automation
 # events but only for the master branch
 on:
   create:
+    - if: ${{ github.event.ref_type == 'branch' }}
 jobs:
   project-management-automation:
     runs-on: ubuntu-latest
     steps:
-      - if: ${{ github.event.ref_type == 'branch' }}
       - uses: actions/checkout@v2
       - run: |
           date > .release-artifact
