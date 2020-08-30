@@ -3457,6 +3457,7 @@ module.exports = opts => {
 const fs = __webpack_require__( 747 );
 const path = __webpack_require__( 622 );
 const { handlebars } = __webpack_require__( 913 );
+const core = __webpack_require__( 470 );
 
 /**
  * Internal dependencies
@@ -3537,10 +3538,15 @@ module.exports = {
 					...context.repo,
 					path: `.github/${ name }.md`,
 				} );
-				if ( response.content && response.encoding ) {
+				core.debug( 'template response:' + JSON.stringify( response ) );
+				if (
+					response.data &&
+					response.data.content &&
+					response.data.encoding
+				) {
 					const buffer = new Buffer(
-						response.content,
-						response.encoding
+						response.data.content,
+						response.data.encoding
 					);
 					templateContents = buffer.toString( 'utf-8' );
 				}
