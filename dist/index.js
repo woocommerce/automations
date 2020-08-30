@@ -3544,7 +3544,7 @@ module.exports = {
 					response.data.content &&
 					response.data.encoding
 				) {
-					const buffer = new Buffer(
+					const buffer = Buffer.from(
 						response.data.content,
 						response.data.encoding
 					);
