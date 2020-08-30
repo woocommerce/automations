@@ -32517,6 +32517,7 @@ const branchHandler = async ( context, octokit, config ) => {
 		context,
 		octokit
 	);
+	core.debug( `Has milestone: ${ hasMilestone }` );
 	try {
 		if ( ! hasMilestone ) {
 			throw new Error(
@@ -32532,6 +32533,7 @@ const branchHandler = async ( context, octokit, config ) => {
 		changelog = await getChangelog( changelogItems, config );
 		devNoteItems = getDevNoteItems( changelogItems, config );
 	} catch ( e ) {
+		core.debug( `Error ${ e }` );
 		// @todo Handle re-attempting creation of changelog after resolving error.
 		//
 		// Currently, the changelog error is a consistent error message string
