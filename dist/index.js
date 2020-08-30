@@ -30271,7 +30271,7 @@ module.exports = {
 							configKey,
 							'its an Array when an object is expected'
 						);
-						return;
+						throw new Error( 'Invalid type' );
 					}
 				}
 				if ( typeToCheck === 'array' ) {
@@ -30280,16 +30280,19 @@ module.exports = {
 							configKey,
 							'it is not an array when an array is expected'
 						);
-						return;
+						throw new Error( 'Invalid type' );
 					}
 				}
 				// all other type checks.
-				if ( typeof configValue !== typeToCheck ) {
+				if (
+					typeToCheck !== 'array' &&
+					typeof configValue !== typeToCheck
+				) {
 					failForType(
 						configKey,
 						`it is not an ${ typeToCheck } (but a ${ typeof configValue })`
 					);
-					return;
+					throw new Error( 'Invalid type' );
 				}
 				if ( types[ configKey ].items ) {
 					const expectedItemType = types[ configKey ].items.type;
@@ -30306,6 +30309,7 @@ module.exports = {
 							configKey,
 							`it expects values in the ${ typeToCheck } for the ${ configKey } property to be of type ${ expectedItemType }. Something in the ${ typeToCheck } is not that type.`
 						);
+						throw new Error( 'Invalid type' );
 					}
 				}
 			}
