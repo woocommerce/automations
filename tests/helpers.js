@@ -56,15 +56,13 @@ exports.gimmeOctokit = () => {
 			create: jest
 				.fn( ( data ) => Promise.resolve( { data } ) )
 				.mockName( 'issues.create' ),
-			listMilestonesForRepo: {
+			listMilestones: {
 				endpoint: {
 					merge: jest
 						.fn( () => ( {
 							type: 'list.milestones',
 						} ) )
-						.mockName(
-							'issues.listMilestonesForRepo.endpoint.merge'
-						),
+						.mockName( 'issues.listMilestones.endpoint.merge' ),
 				},
 			},
 			listForRepo: {
@@ -93,9 +91,9 @@ exports.gimmeOctokit = () => {
 			getCommit: jest
 				.fn( () => loadDiff( 'basic' ) )
 				.mockName( 'repos.getCommit' ),
-			getContents: jest
+			getContent: jest
 				.fn( () => Promise.resolve( { content: '' } ) )
-				.mockName( 'repos.getContents' ),
+				.mockName( 'repos.getContent' ),
 			getBranch: jest.fn().mockName( 'repos.getBranch' ),
 		},
 		pulls: {
