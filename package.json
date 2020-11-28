@@ -25,16 +25,16 @@
 		"lint:fix": "wp-scripts lint-js ./lib ./tests --fix"
 	},
 	"dependencies": {
-		"@actions/core": "^1.2.4",
-		"@actions/github": "^2.1.1",
+		"@actions/core": "^1.2.6",
+		"@actions/github": "^4.0.0",
+		"@vercel/ncc": "^0.25.1",
 		"hbs": "^4.1.1",
-		"parse-diff": "^0.7.0",
-		"lodash": "4.17.15"
+		"lodash": "4.17.15",
+		"parse-diff": "^0.7.1"
 	},
 	"devDependencies": {
-		"@wordpress/eslint-plugin": "^6.0.0",
-		"@wordpress/scripts": "^9.1.0",
-		"@zeit/ncc": "^0.22.1",
-		"jest": "^26.0.1"
+		"@wordpress/eslint-plugin": "^7.3.0",
+		"@wordpress/scripts": "^12.5.0",
+		"jest": "^26.6.3"
 	}
 }
