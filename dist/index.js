@@ -1861,7 +1861,7 @@ module.exports = ifNotFork;
  */
 const { setFailed, getInput, debug: coreDebug } = __webpack_require__( 2186 );
 const GitHub = __webpack_require__( 5438 );
-const context = github.context;
+const context = GitHub.context;
 
 /**
  * Internal dependencies
