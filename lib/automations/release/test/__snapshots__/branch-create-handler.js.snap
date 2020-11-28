@@ -124,7 +124,7 @@ Array [
 ]
 `;
 
-exports[`branch-create-handler for release pull request generation creates a pull request 1`] = `
+exports[`branch-create-handler for release pull request generation creates a pull request with changelog 1`] = `
 Array [
   Object {
     "base": "trunk",
@@ -146,6 +146,7 @@ This release introduces:
 #### Various
 
 - Found a bug. ([1347](https://github.com/octocat/Hello-World/issues/1347))
+- Fixed an item and this should be the changelog entry. ([1348](https://github.com/octocat/Hello-World/issues/1348))
 
 
 
@@ -227,7 +228,7 @@ _Link to any special instructions or helpful notes for HE related to this releas
 ]
 `;
 
-exports[`branch-create-handler for release pull request generation creates a pull request 2`] = `
+exports[`branch-create-handler for release pull request generation creates a pull request with changelog 2`] = `
 Array [
   Object {
     "body": "The release pull request has been created! This checklist is a guide to follow for the remainder of the release process. You can check off each item in this list once completed.
