@@ -2250,6 +2250,16 @@ const TITLE_NORMALIZATIONS = ( config ) => [
 function getNormalizedTitle( title, issue, config ) {
 	/** @type {string|undefined} */
 	let normalizedTitle = title;
+	if ( /### Changelog\r\n\r\n> /.test( issue.body ) ) {
+		const bodyParts = issue.body.split( '### Changelog\r\n\r\n> ' );
+		const note = bodyParts[ bodyParts.length - 1 ];
+		normalizedTitle = note
+			// Remove comment prompt
+			.replace( /<!---(.*)--->/gm, '' )
+			// Remove new lines and whitespace
+			.trim();
+		normalizedTitle = ! normalizedTitle.length ? title : normalizedTitle;
+	}
 	for ( const normalize of TITLE_NORMALIZATIONS( config ) ) {
 		normalizedTitle = normalize( normalizedTitle, issue );
 		if ( normalizedTitle === undefined ) {
