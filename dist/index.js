@@ -652,13 +652,10 @@ const duplicateChecker = async ( context, octokit, title ) => {
 
 	if ( search.data.total_count !== 0 ) {
 		const existingPr = search.data.items.find( ( pr ) => {
-			if (
-				pr.title !== title ||
-				( pr.merged === true && pr.state === 'closed' )
-			) {
-				return false;
+			if ( pr.title === title && pr.merged === false ) {
+				return true;
 			}
-			return true;
+			return false;
 		} );
 		return existingPr;
 	}
