@@ -261,7 +261,7 @@ module.exports = {
 		let repoConfig = {};
 		// check if config file exists on GitHub repo.
 		try {
-			const response = await octokit.repos.getContents( {
+			const response = await octokit.repos.getContent( {
 				...context.repo,
 				path: '.github/release-automation-config.json',
 			} );
@@ -585,7 +585,7 @@ module.exports = {
 		let templateContents = '';
 		if ( templateObject.canOverride ) {
 			try {
-				const response = await octokit.repos.getContents( {
+				const response = await octokit.repos.getContent( {
 					...context.repo,
 					path: `.github/${ name }.md`,
 				} );
@@ -1860,7 +1860,8 @@ module.exports = ifNotFork;
  * External dependencies
  */
 const { setFailed, getInput, debug: coreDebug } = __webpack_require__( 2186 );
-const { context, GitHub } = __webpack_require__( 5438 );
+const GitHub = __webpack_require__( 5438 );
+const context = github.context;
 
 /**
  * Internal dependencies
@@ -1890,7 +1891,7 @@ const automations = __webpack_require__( 9407 );
 		return;
 	}
 
-	const octokit = new GitHub( token );
+	const octokit = GitHub.getOctokit( token );
 
 	debug(
 		`initialize: Received event = '${ context.eventName }', action = '${ context.payload.action }'`
@@ -2554,7 +2555,7 @@ function getVersionsToCheck( version ) {
  * @return {Promise<IssuesListMilestonesForRepoResponseItem|void>} Promise resolving to milestone, if exists.
  */
 async function getMilestoneByTitle( context, octokit, title, state = 'open' ) {
-	const options = octokit.issues.listMilestonesForRepo.endpoint.merge( {
+	const options = octokit.issues.listMilestones.endpoint.merge( {
 		...context.repo,
 		state,
 	} );
