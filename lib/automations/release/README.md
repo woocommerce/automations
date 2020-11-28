@@ -10,6 +10,23 @@ Currently:
   - will create a pull request using `.github/release-pull-request.md` or `.github/patch-release-pull-request.md` templates found in the project's repo or falling back to the templates in this action.
   - will generate and add the changelog for the release to the pull request description (using the configuration provided in the project's `.github/release-automation-config.json` file).
   - will generate a release checklist using the `.github/release-initial-checklist.md` or `.github/patch-initial-checklist.md` templates and add as a comment on the pull request for the branch.
+  
+### Changelog generation
+
+This automation will automatically generate a changelog from all the closed pull requests in the milestone matching the release version. So if your release branch is `release/3.1.0` then a milestone with the title `3.1.0` will be looked for and if it exists, all closed prs in that milestone will be used for generating the changelog.
+
+The changelog entry will be generated:
+
+- Using the special formatted changelog entry in the pull request body if it exists. Otherwise the pull request title is used. Example:
+
+```
+### Changelog
+
+> This is a custom changelog note.
+```
+
+- Using labels to group changelog entries by type (following the labels in the automation config).
+- If no matching label, attempt to derive the type from the text of the entry (i.e. the word "Fixed" would trigger belonging to "Bug" group). 
 
 ## Usage
 
@@ -21,7 +38,7 @@ on:
   create:
 jobs:
   release-automation:
-    if: ${{ github.event.ref_type == 'branch' }}
+    if: ${{ github.event.ref_type == 'branch' && contains( github.ref, 'release/' ) }}
     runs-on: ubuntu-latest
     steps:
       # This is needed to make sure the created branch has a changeset. Otherwise the pull request
