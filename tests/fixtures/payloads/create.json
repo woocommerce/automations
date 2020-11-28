@@ -1,7 +1,7 @@
 {
 	"ref": "release/3.0",
 	"ref_type": "branch",
-	"master_branch": "master",
+	"master_branch": "trunk",
 	"description": null,
 	"pusher_type": "user",
 	"repository": {
@@ -96,7 +96,7 @@
 	  "forks": 1,
 	  "open_issues": 2,
 	  "watchers": 0,
-	  "default_branch": "master"
+	  "default_branch": "trunk"
 	},
 	"sender": {
 	  "login": "Codertocat",

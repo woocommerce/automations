@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: master
+          ref: trunk
       - uses: ./
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

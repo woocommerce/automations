@@ -1,5 +1,5 @@
 {
-  "ref": "refs/heads/master",
+  "ref": "refs/heads/trunk",
   "before": "46e3daa3218850cf3262eed1ff0f1eecb0769d2f",
   "after": "e06c237a0c041f5a0a61f1c361f7a1d6f3d669af",
   "created": false,
@@ -142,9 +142,9 @@
     "forks": 0,
     "open_issues": 19,
     "watchers": 0,
-    "default_branch": "master",
+    "default_branch": "trunk",
     "stargazers": 0,
-    "master_branch": "master"
+    "master_branch": "trunk"
   },
   "pusher": {
     "name": "nerrad",

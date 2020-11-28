@@ -47,7 +47,7 @@ This will be expanded, but for reference:
 
 ### Builds and releases
 
-- All pushes to master will automatically build the `dist/index.js` file for the action (then commit and push to master). So no need to worry about builds.
+- All pushes to trunk will automatically build the `dist/index.js` file for the action (then commit and push to trunk). So no need to worry about builds.
 - For releases, make sure you update the examples in the `README.md` if releasing a major version, otherwise just create a release manually (in the future this may get automated for releases).
 
 ### Adding a new automation.
@@ -69,8 +69,8 @@ module.exports = {
   runner
 }
 ```
-- As noted above, this export must include a `runner` for your automation. The runner is an async function that will receive two arguments: `context` (which is the GitHub action context value) and `octokit` (which is the GitHub api helper). See more about these two arguments [here](https://github.com/actions/toolkit/tree/master/packages/github) (they are essentially what gets exposed by the `@actions/github` package). You can use the [`todos` runner as an example](https://github.com/woocommerce/automations/blob/master/lib/automations/todos/runner.js).
-- Finally, in [`lib/automations.js`](https://github.com/woocommerce/automations/automations/blob/master/lib/automations.js), makes sure you import your automation configuration into this file and add it to the `moduleNames` array. So for example, if your automation was setup in `lib/automations/my-automation`, you would have something like this in the file after your changes:
+- As noted above, this export must include a `runner` for your automation. The runner is an async function that will receive two arguments: `context` (which is the GitHub action context value) and `octokit` (which is the GitHub api helper). See more about these two arguments [here](https://github.com/actions/toolkit/tree/trunk/packages/github) (they are essentially what gets exposed by the `@actions/github` package). You can use the [`todos` runner as an example](https://github.com/woocommerce/automations/blob/trunk/lib/automations/todos/runner.js).
+- Finally, in [`lib/automations.js`](https://github.com/woocommerce/automations/automations/blob/trunk/lib/automations.js), makes sure you import your automation configuration into this file and add it to the `moduleNames` array. So for example, if your automation was setup in `lib/automations/my-automation`, you would have something like this in the file after your changes:
 
 ```js
 

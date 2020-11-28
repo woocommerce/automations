@@ -160,12 +160,12 @@
         "forks": 0,
         "open_issues": 19,
         "watchers": 0,
-        "default_branch": "master"
+        "default_branch": "trunk"
       }
     },
     "base": {
-      "label": "nerrad:master",
-      "ref": "master",
+      "label": "nerrad:trunk",
+      "ref": "trunk",
       "sha": "49b33294236494d3a16ee800aacd53632b82656d",
       "user": {
         "login": "nerrad",
@@ -275,7 +275,7 @@
         "forks": 0,
         "open_issues": 19,
         "watchers": 0,
-        "default_branch": "master"
+        "default_branch": "trunk"
       }
     },
     "_links": {
@@ -425,7 +425,7 @@
     "forks": 0,
     "open_issues": 19,
     "watchers": 0,
-    "default_branch": "master"
+    "default_branch": "trunk"
   },
   "sender": {
     "login": "nerrad",
