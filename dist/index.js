@@ -652,27 +652,33 @@ const duplicateChecker = async ( context, octokit, title ) => {
 
 	// if there's a match with open pr then abort early
 	if (
-		openSearch.data.items.filter(
-			( pr ) => pr.title === title && pr.state === 'open'
-		).length > 0
+		openSearch.data.items.filter( ( pr ) => pr.title === title ).length > 0
 	) {
 		return true;
 	}
 
-	const closedSearch = await octokit.search.issuesAndPullRequests( {
-		q: `${ title } in:title is:closed type:pr repo:${ context.payload.repository.full_name }`,
+	const closedMergedSearch = await octokit.search.issuesAndPullRequests( {
+		q: `${ title } in:title is:closed type:pr repo:${ context.payload.repository.full_name } is:merged`,
 		per_page: 50,
 	} );
 
-	const items = closedSearch.data.items.filter(
-		( pr ) => pr.title === title
-	);
+	// if we have a match to the title in these results, then that means we return false
+	// because the pull request was merged.
+	if (
+		closedMergedSearch.data.items.filter( ( pr ) => pr.title === title )
+			.length > 0
+	) {
+		return false;
+	}
 
-	// if any of the closed items matching the search are merged, then we return
-	// false.
+	const closedSearch = await octokit.search.issuesAndPullRequests( {
+		q: `${ title } in:title is:closed type:pr repo:${ context.payload.repository.full_name } is:unmerged`,
+		per_page: 50,
+	} );
+
 	return (
-		items.length > 0 &&
-		items.filter( ( pr ) => pr.merged === true ).length === 0
+		closedSearch.data.items.filter( ( pr ) => pr.title === title ).length >
+		0
 	);
 };
 
