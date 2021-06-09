@@ -98,7 +98,7 @@ module.exports = async (context, octokit) => {
 		return;
 	}
 
-	debug(milestones);
+	debug(JSON.stringify(milestones));
 
 	const milestoneNumber = milestones[0].number;
 
