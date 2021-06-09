@@ -1,17 +1,17 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require( 'fs' );
+const path = require( 'path' );
 
-const loadDiff = (exports.loadDiff = (filename) => {
-	return Promise.resolve({
+const loadDiff = ( exports.loadDiff = ( filename ) => {
+	return Promise.resolve( {
 		data: fs.readFileSync(
-			path.join(__dirname, 'fixtures', 'diffs', filename + '.txt'),
+			path.join( __dirname, 'fixtures', 'diffs', filename + '.txt' ),
 			'utf8'
 		),
 		headers: { 'content-length': 1 },
-	});
-});
+	} );
+} );
 
-exports.gimmeContext = (eventName, action) => {
+exports.gimmeContext = ( eventName, action ) => {
 	class ContextMock {
 		constructor() {
 			this.action = action;
@@ -37,9 +37,9 @@ exports.gimmeContext = (eventName, action) => {
 		getPayload() {
 			const filename =
 				typeof this.action !== 'undefined'
-					? `${eventName}.${action}.json`
-					: `${eventName}.json`;
-			return require(`./fixtures/payloads/${filename}`);
+					? `${ eventName }.${ action }.json`
+					: `${ eventName }.json`;
+			return require( `./fixtures/payloads/${ filename }` );
 		}
 	}
 	return new ContextMock();
@@ -47,105 +47,105 @@ exports.gimmeContext = (eventName, action) => {
 
 exports.gimmeOctokit = () => {
 	const listMilestones = jest
-		.fn(() =>
-			Promise.resolve({
-				data: require('./fixtures/payloads/milestone-list.json'),
-			})
+		.fn( () =>
+			Promise.resolve( {
+				data: require( './fixtures/payloads/milestone-list.json' ),
+			} )
 		)
-		.mockName('issues.listMilestones');
+		.mockName( 'issues.listMilestones' );
 
 	listMilestones.endpoint = {
 		merge: jest
-			.fn(() => ({
+			.fn( () => ( {
 				type: 'list.milestones',
-			}))
-			.mockName('issues.listMilestones.endpoint.merge'),
+			} ) )
+			.mockName( 'issues.listMilestones.endpoint.merge' ),
 	};
 
 	return {
 		issues: {
-			update: jest.fn().mockName('issues.update'),
-			createComment: jest.fn().mockName('issues.createComment'),
+			update: jest.fn().mockName( 'issues.update' ),
+			createComment: jest.fn().mockName( 'issues.createComment' ),
 			listComments: jest
-				.fn(() => Promise.resolve({ data: [] }))
-				.mockName('issues.listComments'),
+				.fn( () => Promise.resolve( { data: [] } ) )
+				.mockName( 'issues.listComments' ),
 			create: jest
-				.fn((data) => Promise.resolve({ data }))
-				.mockName('issues.create'),
+				.fn( ( data ) => Promise.resolve( { data } ) )
+				.mockName( 'issues.create' ),
 			listMilestones,
 			listForRepo: {
 				endpoint: {
 					merge: jest
-						.fn(() => ({
+						.fn( () => ( {
 							type: 'list.issues',
-						}))
-						.mockName('issues.listForRepo.endpoint.merge'),
+						} ) )
+						.mockName( 'issues.listForRepo.endpoint.merge' ),
 				},
 			},
 		},
 		git: {
 			getCommit: jest
-				.fn(() => Promise.resolve({ data: { parents: [1] } }))
-				.mockName('git.getCommit'),
+				.fn( () => Promise.resolve( { data: { parents: [ 1 ] } } ) )
+				.mockName( 'git.getCommit' ),
 		},
 		search: {
 			issuesAndPullRequests: jest
-				.fn(() =>
-					Promise.resolve({ data: { total_count: 0, items: [] } })
+				.fn( () =>
+					Promise.resolve( { data: { total_count: 0, items: [] } } )
 				)
-				.mockName('search.issuesAndPullRequests'),
+				.mockName( 'search.issuesAndPullRequests' ),
 		},
 		repos: {
 			getCommit: jest
-				.fn(() => loadDiff('basic'))
-				.mockName('repos.getCommit'),
+				.fn( () => loadDiff( 'basic' ) )
+				.mockName( 'repos.getCommit' ),
 			getContent: jest
-				.fn(() => Promise.resolve({ content: '' }))
-				.mockName('repos.getContent'),
-			getBranch: jest.fn().mockName('repos.getBranch'),
+				.fn( () => Promise.resolve( { content: '' } ) )
+				.mockName( 'repos.getContent' ),
+			getBranch: jest.fn().mockName( 'repos.getBranch' ),
 		},
 		pulls: {
-			get: jest.fn(() => loadDiff('basic')).mockName('pulls.get'),
+			get: jest.fn( () => loadDiff( 'basic' ) ).mockName( 'pulls.get' ),
 			create: jest
-				.fn(() => Promise.resolve({ data: { number: 1235 } }))
-				.mockName('pulls.create'),
+				.fn( () => Promise.resolve( { data: { number: 1235 } } ) )
+				.mockName( 'pulls.create' ),
 		},
 		paginate: {
 			iterator: jest
-				.fn((options) => {
-					switch (options.type) {
+				.fn( ( options ) => {
+					switch ( options.type ) {
 						case 'list.milestones':
-							return mockedAsyncIterator([
-								{ data: [{ title: '3.0.0', number: 1234 }] },
-							])();
+							return mockedAsyncIterator( [
+								{ data: [ { title: '3.0.0', number: 1234 } ] },
+							] )();
 						case 'list.issues':
-							return mockedAsyncIterator([
+							return mockedAsyncIterator( [
 								{
-									data: require('./fixtures/payloads/issues-list.json'),
+									data: require( './fixtures/payloads/issues-list.json' ),
 								},
-							])();
+							] )();
 					}
-					return mockedAsyncIterator({})();
-				})
-				.mockName('paginate.iterator'),
+					return mockedAsyncIterator( {} )();
+				} )
+				.mockName( 'paginate.iterator' ),
 		},
 	};
 };
 
-const mockedAsyncIterator = (resolvedValue) =>
+const mockedAsyncIterator = ( resolvedValue ) =>
 	async function* iterable() {
-		const values = await Promise.resolve(resolvedValue);
-		for (const value of values) {
+		const values = await Promise.resolve( resolvedValue );
+		for ( const value of values ) {
 			yield value;
 		}
 	};
 
-exports.gimmeConfig = (appType) => {
-	const app = require(`../lib/automations/${appType}`);
+exports.gimmeConfig = ( appType ) => {
+	const app = require( `../lib/automations/${ appType }` );
 	return app.getConfig();
 };
 
-exports.gimmeApp = (appType) => {
-	const app = require(`../lib/automations/${appType}`);
+exports.gimmeApp = ( appType ) => {
+	const app = require( `../lib/automations/${ appType }` );
 	return app.runner;
 };
