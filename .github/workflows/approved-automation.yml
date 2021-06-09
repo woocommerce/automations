@@ -1,5 +1,5 @@
 on: pull_request_review
-name: Add Next Milestone to Approved Pull Requests
+name: Add milestone when approved
 jobs:
     milestoneWhenApproved:
         runs-on: ubuntu-latest
