@@ -1,0 +1,10 @@
+on: pull_request_review
+name: Add Next Milestone to Approved Pull Requests
+jobs:
+    milestoneWhenApproved:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: ./
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  automations: assign-milestone
