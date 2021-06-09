@@ -70,14 +70,16 @@ module.exports = async (context, octokit) => {
 
 	// Check state
 	if (reviewState !== 'approved') {
-		debug(`pullRequestReviewHandler: Review state is not approved.`);
-		return;
+		debug(
+			`pullRequestReviewHandler: Review state is not approved--bailing.`
+		);
+		//return;
 	}
 
 	// Check current milestone
 	if (context.payload.pull_request.milestone !== null) {
 		debug(
-			`pullRequestReviewHandler: Pull request already has a milestone.`
+			`pullRequestReviewHandler: Pull request already has a milestone--bailing.`
 		);
 		return;
 	}
