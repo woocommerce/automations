@@ -21,9 +21,166 @@ module.exports = JSON.parse("{\"labelTypePrefix\":\"type: \",\"labelTypeMap\":{\
  * @type {AutomationTask[]}
  */
 module.exports = [
-	__webpack_require__( 2994 ),
-	__webpack_require__( 7866 ),
+	__webpack_require__(2994),
+	__webpack_require__(7866),
+	__webpack_require__(8224),
 ];
+
+
+/***/ }),
+
+/***/ 8224:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const runner = __webpack_require__(2433);
+
+module.exports = {
+	name: 'assign-milestone',
+	events: ['pull_request_review'],
+	actions: ['submitted', 'edited'],
+	runner,
+};
+
+
+/***/ }),
+
+/***/ 2406:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+/**
+ * Internal dependencies
+ */
+const debug = __webpack_require__(5800);
+
+/**
+ * @typedef {import('../../typedefs').GitHubContext} GitHubContext
+ * @typedef {import('../../typedefs').GitHub} GitHub
+ */
+
+/**
+ * @param {GitHubContext} context
+ * @param {GitHub} octokit
+ */
+module.exports = async (context, octokit) => {
+	const pullNumber = context.payload.pull_request.number;
+	const reviewState = context.payload.review.state;
+
+	debug(`pullRequestReviewHandler: Pull Request number is [${pullNumber}].`);
+	debug(`pullRequestReviewHandler: Review state is [${reviewState}].`);
+
+	// Check state
+	if (reviewState !== 'approved') {
+		debug(`pullRequestReviewHandler: Review state is not approved.`);
+		return;
+	}
+
+	// Check current milestone
+	if (context.payload.pull_request.milestone !== null) {
+		debug(
+			`pullRequestReviewHandler: Pull request already has a milestone.`
+		);
+		return;
+	}
+
+	// Get next milestone
+	const milestones = await octokit.issues.listMilestones({
+		...context.repo,
+		sort: 'due_on',
+		direction: 'asc',
+	});
+
+	if (!milestones) {
+		debug(
+			`pullRequestReviewHandler: There are no milestones available to assign to this PR.`
+		);
+		return;
+	}
+
+	const milestoneNumber = milestones[0].number;
+
+	// Assign milestone
+	const milestoneAssigned = await octokit.issues.update({
+		...context.repo,
+		issue_number: pullNumber,
+		milestone: milestoneNumber,
+	});
+
+	if (!milestoneAssigned) {
+		debug(
+			`pullRequestReviewHandler: Could not assign milestone [${milestoneNumber}] to pull request [${pullNumber}].`
+		);
+		return;
+	}
+};
+
+
+/***/ }),
+
+/***/ 2433:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+/**
+ * External dependencies
+ */
+const debug = __webpack_require__(5800);
+const { setFailed } = __webpack_require__(2186);
+
+/**
+ * Internal dependencies
+ */
+const pullRequestReviewHandler = __webpack_require__(2406);
+
+/**
+ * @typedef {import('@actions/github').GitHub} GitHub
+ * @typedef {import('@actions/github').context} GitHubContext
+ * @typedef {import('../../typedefs').AutomationTaskRunner} AutomationTaskRunner
+ */
+
+const runnerMatrix = {
+	pull_request_review: {
+		submitted: pullRequestReviewHandler,
+		edited: pullRequestReviewHandler,
+	},
+};
+
+/**
+ * Whether or not this runner should run given the event and action.
+ *
+ * @param {string} eventName The event we want the runner for.
+ * @param {string} [action]  The action we want the runner for.
+ *
+ * @return {AutomationTaskRunner} A runner function.
+ */
+const getRunnerTask = (eventName, action) => {
+	if (!runnerMatrix[eventName]) {
+		return;
+	}
+	return action === undefined
+		? runnerMatrix[eventName]
+		: runnerMatrix[eventName][action];
+};
+
+/**
+ * The task runner for this action
+ *
+ * @param {GitHubContext} context Context for the job run (github).
+ * @param {GitHub}        octokit GitHub api helper.
+ *
+ * @return {AutomationTaskRunner} task runner.
+ */
+const runner = async (context, octokit) => {
+	const task = getRunnerTask(context.eventName, context.payload.action);
+	if (typeof task === 'function') {
+		debug(`assignMilestoneRunner: Executing the ${task.name} task.`);
+		await task(context, octokit);
+	} else {
+		setFailed(
+			`assignMilestoneRunner: There is no configured task for the event = '${context.eventName}' and the payload action = '${context.payload.action}'`
+		);
+	}
+};
+
+module.exports = runner;
 
 
 /***/ }),
