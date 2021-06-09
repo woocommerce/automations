@@ -98,6 +98,8 @@ module.exports = async (context, octokit) => {
 		return;
 	}
 
+	debug(milestones);
+
 	const milestoneNumber = milestones[0].number;
 
 	// Assign milestone
