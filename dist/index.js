@@ -73,7 +73,7 @@ module.exports = async (context, octokit) => {
 		debug(
 			`pullRequestReviewHandler: Review state is not approved--bailing.`
 		);
-		//return;
+		return;
 	}
 
 	// Check current milestone

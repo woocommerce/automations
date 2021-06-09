@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pull-request-review-handler assigns milestones to pull requests assigns a milestone to an approved pull request 1`] = `
+Array [
+  Object {
+    "issue_number": 40,
+    "milestone": 3,
+    "owner": "nerrad",
+    "repo": "tests",
+  },
+]
+`;
