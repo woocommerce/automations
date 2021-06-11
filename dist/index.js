@@ -21,9 +21,9 @@ module.exports = JSON.parse("{\"labelTypePrefix\":\"type: \",\"labelTypeMap\":{\
  * @type {AutomationTask[]}
  */
 module.exports = [
-	__webpack_require__(2994),
-	__webpack_require__(7866),
-	__webpack_require__(8224),
+	__webpack_require__( 2994 ),
+	__webpack_require__( 7866 ),
+	__webpack_require__( 8224 ),
 ];
 
 
@@ -32,12 +32,12 @@ module.exports = [
 /***/ 8224:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-const runner = __webpack_require__(2433);
+const runner = __webpack_require__( 2433 );
 
 module.exports = {
 	name: 'assign-milestone',
-	events: ['pull_request_review'],
-	actions: ['submitted', 'edited'],
+	events: [ 'pull_request_review' ],
+	actions: [ 'submitted', 'edited' ],
 	runner,
 };
 
@@ -50,7 +50,7 @@ module.exports = {
 /**
  * Internal dependencies
  */
-const debug = __webpack_require__(5800);
+const debug = __webpack_require__( 5800 );
 
 /**
  * @typedef {import('../../typedefs').GitHubContext} GitHubContext
@@ -61,15 +61,17 @@ const debug = __webpack_require__(5800);
  * @param {GitHubContext} context
  * @param {GitHub} octokit
  */
-module.exports = async (context, octokit) => {
+module.exports = async ( context, octokit ) => {
 	const pullNumber = context.payload.pull_request.number;
 	const reviewState = context.payload.review.state;
 
-	debug(`pullRequestReviewHandler: Pull Request number is [${pullNumber}].`);
-	debug(`pullRequestReviewHandler: Review state is [${reviewState}].`);
+	debug(
+		`pullRequestReviewHandler: Pull Request number is [${ pullNumber }].`
+	);
+	debug( `pullRequestReviewHandler: Review state is [${ reviewState }].` );
 
 	// Check state
-	if (reviewState !== 'approved') {
+	if ( reviewState !== 'approved' ) {
 		debug(
 			`pullRequestReviewHandler: Review state is not approved--bailing.`
 		);
@@ -77,7 +79,7 @@ module.exports = async (context, octokit) => {
 	}
 
 	// Check current milestone
-	if (context.payload.pull_request.milestone !== null) {
+	if ( context.payload.pull_request.milestone !== null ) {
 		debug(
 			`pullRequestReviewHandler: Pull request already has a milestone--bailing.`
 		);
@@ -85,33 +87,32 @@ module.exports = async (context, octokit) => {
 	}
 
 	// Get next milestone
-	const milestones = await octokit.issues.listMilestones({
+	const milestones = await octokit.issues.listMilestones( {
 		...context.repo,
 		sort: 'due_on',
 		direction: 'asc',
-	});
+	} );
 
-	if (!milestones.data || !milestones.data[0]) {
+	if ( ! milestones.data || ! milestones.data[ 0 ] ) {
 		debug(
 			`pullRequestReviewHandler: There are no milestones available to assign to this PR.`
 		);
 		return;
 	}
 
-	const milestoneNumber = milestones.data[0].number;
+	const milestoneNumber = milestones.data[ 0 ].number;
 
 	// Assign milestone
-	const milestoneAssigned = await octokit.issues.update({
+	const milestoneAssigned = await octokit.issues.update( {
 		...context.repo,
 		issue_number: pullNumber,
 		milestone: milestoneNumber,
-	});
+	} );
 
-	if (!milestoneAssigned) {
+	if ( ! milestoneAssigned ) {
 		debug(
-			`pullRequestReviewHandler: Could not assign milestone [${milestoneNumber}] to pull request [${pullNumber}].`
+			`pullRequestReviewHandler: Could not assign milestone [${ milestoneNumber }] to pull request [${ pullNumber }].`
 		);
-		return;
 	}
 };
 
@@ -124,13 +125,13 @@ module.exports = async (context, octokit) => {
 /**
  * External dependencies
  */
-const debug = __webpack_require__(5800);
-const { setFailed } = __webpack_require__(2186);
+const debug = __webpack_require__( 5800 );
+const { setFailed } = __webpack_require__( 2186 );
 
 /**
  * Internal dependencies
  */
-const pullRequestReviewHandler = __webpack_require__(2406);
+const pullRequestReviewHandler = __webpack_require__( 2406 );
 
 /**
  * @typedef {import('@actions/github').GitHub} GitHub
@@ -153,13 +154,13 @@ const runnerMatrix = {
  *
  * @return {AutomationTaskRunner} A runner function.
  */
-const getRunnerTask = (eventName, action) => {
-	if (!runnerMatrix[eventName]) {
+const getRunnerTask = ( eventName, action ) => {
+	if ( ! runnerMatrix[ eventName ] ) {
 		return;
 	}
 	return action === undefined
-		? runnerMatrix[eventName]
-		: runnerMatrix[eventName][action];
+		? runnerMatrix[ eventName ]
+		: runnerMatrix[ eventName ][ action ];
 };
 
 /**
@@ -170,14 +171,14 @@ const getRunnerTask = (eventName, action) => {
  *
  * @return {AutomationTaskRunner} task runner.
  */
-const runner = async (context, octokit) => {
-	const task = getRunnerTask(context.eventName, context.payload.action);
-	if (typeof task === 'function') {
-		debug(`assignMilestoneRunner: Executing the ${task.name} task.`);
-		await task(context, octokit);
+const runner = async ( context, octokit ) => {
+	const task = getRunnerTask( context.eventName, context.payload.action );
+	if ( typeof task === 'function' ) {
+		debug( `assignMilestoneRunner: Executing the ${ task.name } task.` );
+		await task( context, octokit );
 	} else {
 		setFailed(
-			`assignMilestoneRunner: There is no configured task for the event = '${context.eventName}' and the payload action = '${context.payload.action}'`
+			`assignMilestoneRunner: There is no configured task for the event = '${ context.eventName }' and the payload action = '${ context.payload.action }'`
 		);
 	}
 };
