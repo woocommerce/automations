@@ -46,6 +46,22 @@ exports.gimmeContext = ( eventName, action ) => {
 };
 
 exports.gimmeOctokit = () => {
+	const listMilestones = jest
+		.fn( () =>
+			Promise.resolve( {
+				data: require( './fixtures/payloads/milestone-list.json' ),
+			} )
+		)
+		.mockName( 'issues.listMilestones' );
+
+	listMilestones.endpoint = {
+		merge: jest
+			.fn( () => ( {
+				type: 'list.milestones',
+			} ) )
+			.mockName( 'issues.listMilestones.endpoint.merge' ),
+	};
+
 	return {
 		issues: {
 			update: jest.fn().mockName( 'issues.update' ),
@@ -56,15 +72,7 @@ exports.gimmeOctokit = () => {
 			create: jest
 				.fn( ( data ) => Promise.resolve( { data } ) )
 				.mockName( 'issues.create' ),
-			listMilestones: {
-				endpoint: {
-					merge: jest
-						.fn( () => ( {
-							type: 'list.milestones',
-						} ) )
-						.mockName( 'issues.listMilestones.endpoint.merge' ),
-				},
-			},
+			listMilestones,
 			listForRepo: {
 				endpoint: {
 					merge: jest
