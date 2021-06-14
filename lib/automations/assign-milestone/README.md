@@ -3,6 +3,8 @@
 When a pull request is approved and is not already assigned a milestone, this automation will assign the next milestone to it
 automatically.
 
+The next milestone will be the next minor version, calculated from the current version in package.json. So for example, if the current version is 2.5.2, the milestone will be 2.6 (if it exists).
+
 ## Usage
 
 To implement this action, include it in your workflow configuration file:
