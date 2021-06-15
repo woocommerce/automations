@@ -53,22 +53,28 @@ module.exports = async ( context, octokit ) => {
 	try {
 		core.debug( 'Fetching `package.json` contents' );
 
-		const { content, encoding } = await octokit.repos.getContent( {
+		const response = await octokit.repos.getContent( {
 			...context.repo,
 			path: 'package.json',
 		} );
 
-		if ( ! content ) {
-			throw new Error( 'No content found' );
+		if (
+			response.data &&
+			response.data.content &&
+			response.data.encoding
+		) {
+			const buffer = Buffer.from(
+				response.data.content,
+				response.data.encoding
+			);
+			const { version } = JSON.parse( buffer.toString( 'utf-8' ) );
+
+			core.debug( `Found version: ${ version }` );
+
+			return version;
 		}
 
-		const { version } = JSON.parse(
-			Buffer.from( content, encoding ).toString()
-		);
-
-		core.debug( `Found version in package.json: ${ version }` );
-
-		return version;
+		throw new Error( 'No content found' );
 	} catch ( error ) {
 		core.debug(
 			`Could not find version in package.json. Failed with error: ${ error }`
@@ -136,7 +142,7 @@ module.exports = async ( context, octokit ) => {
 		return;
 	}
 
-	const version = getVersion( context, octokit );
+	const version = await getVersion( context, octokit );
 
 	if ( ! version ) {
 		debug(
