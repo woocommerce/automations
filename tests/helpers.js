@@ -100,22 +100,8 @@ exports.gimmeOctokit = () => {
 				.fn( () => loadDiff( 'basic' ) )
 				.mockName( 'repos.getCommit' ),
 			getContent: jest
-				.fn( () => Promise.resolve( { content: '' } ) )
+				.fn( () => Promise.resolve( { data: { content: '' } } ) )
 				.mockName( 'repos.getContent' ),
-			getContents: jest
-				.fn( () =>
-					Promise.resolve( {
-						data: {
-							content: Buffer.from(
-								JSON.stringify( {
-									version: '3.0.0',
-								} )
-							).toString( 'base64' ),
-							encoding: 'base64',
-						},
-					} )
-				)
-				.mockName( 'repos.getContents' ),
 			getBranch: jest.fn().mockName( 'repos.getBranch' ),
 		},
 		pulls: {

@@ -29,6 +29,58 @@ module.exports = [
 
 /***/ }),
 
+/***/ 6987:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+/**
+ * External dependencies
+ */
+const core = __webpack_require__( 2186 );
+
+/**
+ * @typedef {import('../../../typedefs').GitHubContext} GitHubContext
+ * @typedef {import('../../../typedefs').GitHub} GitHub
+ */
+
+/**
+ * Return the version found in package.json.
+ *
+ * @param {GitHubContext} context
+ * @param {GitHub} octokit
+ * @return {string} Version
+ */
+module.exports = async ( context, octokit ) => {
+	try {
+		core.debug( 'Fetching `package.json` contents' );
+
+		const { content, encoding } = await octokit.repos.getContent( {
+			...context.repo,
+			path: 'package.json',
+		} );
+
+		if ( ! content ) {
+			throw new Error( 'No content found' );
+		}
+
+		const { version } = JSON.parse(
+			Buffer.from( content, encoding ).toString()
+		);
+
+		core.debug( `Found version in package.json: ${ version }` );
+
+		return version;
+	} catch ( error ) {
+		core.debug(
+			`Could not find version in package.json. Failed with error: ${ error }`
+		);
+	}
+
+	return false;
+};
+
+
+/***/ }),
+
 /***/ 8224:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -52,6 +104,7 @@ module.exports = {
  */
 const debug = __webpack_require__( 5800 );
 const { getMilestoneByTitle } = __webpack_require__( 1606 );
+const getVersion = __webpack_require__( 6987 );
 
 /**
  * @typedef {import('../../typedefs').GitHubContext} GitHubContext
@@ -71,8 +124,8 @@ module.exports = async ( context, octokit ) => {
 
 	// Check state
 	if ( reviewState !== 'approved' ) {
-		debug( `assign-milestone: Review state is not approved--bailing.` );
-		return;
+		//debug( `assign-milestone: Review state is not approved--bailing.` );
+		//return;
 	}
 
 	// Check current milestone
@@ -83,19 +136,14 @@ module.exports = async ( context, octokit ) => {
 		return;
 	}
 
-	// Get version.
-	debug( 'assign-milestone: Fetching `package.json` contents' );
+	const version = getVersion( context, octokit );
 
-	const {
-		data: { content, encoding },
-	} = await octokit.repos.getContents( {
-		...context.repo,
-		path: 'package.json',
-	} );
-
-	const { version } = JSON.parse(
-		Buffer.from( content, encoding ).toString()
-	);
+	if ( ! version ) {
+		debug(
+			`assign-milestone: Unable to find current version number--bailing.`
+		);
+		return;
+	}
 
 	let [ major, minor ] = version.split( '.' ).map( Number );
 
