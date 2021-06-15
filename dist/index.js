@@ -29,6 +29,37 @@ module.exports = [
 
 /***/ }),
 
+/***/ 5783:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+/**
+ * External dependencies
+ */
+const { setFailed, getInput, debug: coreDebug } = __webpack_require__( 2186 );
+
+const allowedBumpStrategy = [ 'minor', 'ignore', 'major' ];
+
+module.exports = async () => {
+	const config = {
+		bumpStrategy: getInput( 'bump_strategy' ) || 'minor',
+	};
+
+	coreDebug( 'retrieved config: ' + JSON.stringify( config ) );
+
+	if ( ! config.bumpStrategy.includes( allowedBumpStrategy ) ) {
+		setFailed(
+			`assign-milestone: Invalid bumpStrategy provided. Allowed values: ${ JSON.stringify(
+				allowedBumpStrategy
+			) }`
+		);
+	}
+
+	return config;
+};
+
+
+/***/ }),
+
 /***/ 6987:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -91,12 +122,14 @@ module.exports = async ( context, octokit ) => {
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const runner = __webpack_require__( 2433 );
+const { getConfig } = __webpack_require__( 5783 );
 
 module.exports = {
 	name: 'assign-milestone',
 	events: [ 'pull_request_review' ],
 	actions: [ 'submitted', 'edited' ],
 	runner,
+	getConfig,
 };
 
 
@@ -120,8 +153,9 @@ const getVersion = __webpack_require__( 6987 );
 /**
  * @param {GitHubContext} context
  * @param {GitHub} octokit
+ * @param {Object} config
  */
-module.exports = async ( context, octokit ) => {
+module.exports = async ( context, octokit, config ) => {
 	const pullNumber = context.payload.pull_request.number;
 	const reviewState = context.payload.review.state;
 
@@ -130,8 +164,8 @@ module.exports = async ( context, octokit ) => {
 
 	// Check state
 	if ( reviewState !== 'approved' ) {
-		debug( `assign-milestone: Review state is not approved--bailing.` );
-		return;
+		//debug( `assign-milestone: Review state is not approved--bailing.` );
+		//return;
 	}
 
 	// Check current milestone
@@ -157,12 +191,17 @@ module.exports = async ( context, octokit ) => {
 		`assign-milestone: Current plugin version is ${ major }.${ minor }`
 	);
 
+	console.log( config );
 	// Calculate next milestone
-	if ( minor === 9 ) {
+	if ( config.bumpStrategy === 'minor' ) {
+		if ( minor === 9 ) {
+			major += 1;
+			minor = 0;
+		} else {
+			minor += 1;
+		}
+	} else if ( config.bumpStrategy === 'major' ) {
 		major += 1;
-		minor = 0;
-	} else {
-		minor += 1;
 	}
 
 	const nextMilestone = `${ major }.${ minor }`;
@@ -251,14 +290,15 @@ const getRunnerTask = ( eventName, action ) => {
  *
  * @param {GitHubContext} context Context for the job run (github).
  * @param {GitHub}        octokit GitHub api helper.
+ * @param {Object}        config  Config object.
  *
  * @return {AutomationTaskRunner} task runner.
  */
-const runner = async ( context, octokit ) => {
+const runner = async ( context, octokit, config ) => {
 	const task = getRunnerTask( context.eventName, context.payload.action );
 	if ( typeof task === 'function' ) {
 		debug( `assignMilestoneRunner: Executing the ${ task.name } task.` );
-		await task( context, octokit );
+		await task( context, octokit, config );
 	} else {
 		setFailed(
 			`assignMilestoneRunner: There is no configured task for the event = '${ context.eventName }' and the payload action = '${ context.payload.action }'`
@@ -2140,7 +2180,9 @@ const automations = __webpack_require__( 9407 );
 		);
 		return;
 	}
+
 	const token = getInput( 'github_token' );
+
 	if ( ! token ) {
 		setFailed( 'initialize: Input `github_token` is required' );
 		return;

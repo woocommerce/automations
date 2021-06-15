@@ -118,8 +118,9 @@ exports.gimmeOctokit = () => {
 							return mockedAsyncIterator( [
 								{
 									data: [
-										{ title: '3.0.0', number: 1234 },
-										{ title: '3.1.0', number: 1235 },
+										{ title: '3.0.0', number: 300 },
+										{ title: '3.1.0', number: 310 },
+										{ title: '4.0.0', number: 400 },
 									],
 								},
 							] )();

@@ -4,7 +4,40 @@ exports[`pull-request-review-handler assigns milestones to pull requests assigns
 Array [
   Object {
     "issue_number": 40,
-    "milestone": 1235,
+    "milestone": 310,
+    "owner": "nerrad",
+    "repo": "tests",
+  },
+]
+`;
+
+exports[`pull-request-review-handler assigns milestones to pull requests ignore bumpStrategy 1`] = `
+Array [
+  Object {
+    "issue_number": 40,
+    "milestone": 300,
+    "owner": "nerrad",
+    "repo": "tests",
+  },
+]
+`;
+
+exports[`pull-request-review-handler assigns milestones to pull requests major bumpStrategy 1`] = `
+Array [
+  Object {
+    "issue_number": 40,
+    "milestone": 400,
+    "owner": "nerrad",
+    "repo": "tests",
+  },
+]
+`;
+
+exports[`pull-request-review-handler assigns milestones to pull requests minor bumpStrategy 1`] = `
+Array [
+  Object {
+    "issue_number": 40,
+    "milestone": 310,
     "owner": "nerrad",
     "repo": "tests",
   },
