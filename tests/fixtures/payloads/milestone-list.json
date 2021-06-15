@@ -6,7 +6,7 @@
 		"id": 6838654,
 		"node_id": "MDk6TWlsZXN0b25lNjgzODY1NA==",
 		"number": 3,
-		"title": "1.3.0",
+		"title": "3.0.0",
 		"description": "Test future milestone",
 		"creator": {
 			"login": "mikejolley",
@@ -43,7 +43,7 @@
 		"id": 6838656,
 		"node_id": "MDk6TWlsZXN0b25lNjgzODY1Ng==",
 		"number": 4,
-		"title": "1.4.0",
+		"title": "3.1.0",
 		"description": "Test future milestone.",
 		"creator": {
 			"login": "mikejolley",

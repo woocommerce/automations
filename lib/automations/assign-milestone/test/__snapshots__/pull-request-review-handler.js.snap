@@ -4,7 +4,7 @@ exports[`pull-request-review-handler assigns milestones to pull requests assigns
 Array [
   Object {
     "issue_number": 40,
-    "milestone": 3,
+    "milestone": 1235,
     "owner": "nerrad",
     "repo": "tests",
   },

@@ -100,7 +100,7 @@ exports.gimmeOctokit = () => {
 				.fn( () => loadDiff( 'basic' ) )
 				.mockName( 'repos.getCommit' ),
 			getContent: jest
-				.fn( () => Promise.resolve( { content: '' } ) )
+				.fn( () => Promise.resolve( { data: { content: '' } } ) )
 				.mockName( 'repos.getContent' ),
 			getBranch: jest.fn().mockName( 'repos.getBranch' ),
 		},
@@ -116,7 +116,12 @@ exports.gimmeOctokit = () => {
 					switch ( options.type ) {
 						case 'list.milestones':
 							return mockedAsyncIterator( [
-								{ data: [ { title: '3.0.0', number: 1234 } ] },
+								{
+									data: [
+										{ title: '3.0.0', number: 1234 },
+										{ title: '3.1.0', number: 1235 },
+									],
+								},
 							] )();
 						case 'list.issues':
 							return mockedAsyncIterator( [

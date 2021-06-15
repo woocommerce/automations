@@ -29,6 +29,64 @@ module.exports = [
 
 /***/ }),
 
+/***/ 6987:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+/**
+ * External dependencies
+ */
+const core = __webpack_require__( 2186 );
+
+/**
+ * @typedef {import('../../../typedefs').GitHubContext} GitHubContext
+ * @typedef {import('../../../typedefs').GitHub} GitHub
+ */
+
+/**
+ * Return the version found in package.json.
+ *
+ * @param {GitHubContext} context
+ * @param {GitHub} octokit
+ * @return {string} Version
+ */
+module.exports = async ( context, octokit ) => {
+	try {
+		core.debug( 'Fetching `package.json` contents' );
+
+		const response = await octokit.repos.getContent( {
+			...context.repo,
+			path: 'package.json',
+		} );
+
+		if (
+			response.data &&
+			response.data.content &&
+			response.data.encoding
+		) {
+			const buffer = Buffer.from(
+				response.data.content,
+				response.data.encoding
+			);
+			const { version } = JSON.parse( buffer.toString( 'utf-8' ) );
+
+			core.debug( `Found version: ${ version }` );
+
+			return version;
+		}
+
+		throw new Error( 'No content found' );
+	} catch ( error ) {
+		core.debug(
+			`Could not find version in package.json. Failed with error: ${ error }`
+		);
+	}
+
+	return false;
+};
+
+
+/***/ }),
+
 /***/ 8224:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -51,6 +109,8 @@ module.exports = {
  * Internal dependencies
  */
 const debug = __webpack_require__( 5800 );
+const { getMilestoneByTitle } = __webpack_require__( 1606 );
+const getVersion = __webpack_require__( 6987 );
 
 /**
  * @typedef {import('../../typedefs').GitHubContext} GitHubContext
@@ -65,53 +125,76 @@ module.exports = async ( context, octokit ) => {
 	const pullNumber = context.payload.pull_request.number;
 	const reviewState = context.payload.review.state;
 
-	debug(
-		`pullRequestReviewHandler: Pull Request number is [${ pullNumber }].`
-	);
-	debug( `pullRequestReviewHandler: Review state is [${ reviewState }].` );
+	debug( `assign-milestone: Pull Request number is [${ pullNumber }].` );
+	debug( `assign-milestone: Review state is [${ reviewState }].` );
 
 	// Check state
 	if ( reviewState !== 'approved' ) {
-		debug(
-			`pullRequestReviewHandler: Review state is not approved--bailing.`
-		);
+		debug( `assign-milestone: Review state is not approved--bailing.` );
 		return;
 	}
 
 	// Check current milestone
 	if ( context.payload.pull_request.milestone !== null ) {
 		debug(
-			`pullRequestReviewHandler: Pull request already has a milestone--bailing.`
+			`assign-milestone: Pull request already has a milestone--bailing.`
 		);
 		return;
 	}
+
+	const version = await getVersion( context, octokit );
+
+	if ( ! version ) {
+		debug(
+			`assign-milestone: Unable to find current version number--bailing.`
+		);
+		return;
+	}
+
+	let [ major, minor ] = version.split( '.' ).map( Number );
+
+	debug(
+		`assign-milestone: Current plugin version is ${ major }.${ minor }`
+	);
+
+	// Calculate next milestone
+	if ( minor === 9 ) {
+		major += 1;
+		minor = 0;
+	} else {
+		minor += 1;
+	}
+
+	const nextMilestone = `${ major }.${ minor }`;
 
 	// Get next milestone
-	const milestones = await octokit.issues.listMilestones( {
-		...context.repo,
-		sort: 'due_on',
-		direction: 'asc',
-	} );
+	const milestone = await getMilestoneByTitle(
+		context,
+		octokit,
+		nextMilestone
+	);
 
-	if ( ! milestones.data || ! milestones.data[ 0 ] ) {
+	if ( ! milestone ) {
 		debug(
-			`pullRequestReviewHandler: There are no milestones available to assign to this PR.`
+			`assign-milestone: Could not rediscover milestone by title: ${ nextMilestone }`
 		);
 		return;
 	}
 
-	const milestoneNumber = milestones.data[ 0 ].number;
-
 	// Assign milestone
+	debug(
+		`assign-milestone: Adding issue #${ pullNumber } to milestone #${ milestone.number }`
+	);
+
 	const milestoneAssigned = await octokit.issues.update( {
 		...context.repo,
 		issue_number: pullNumber,
-		milestone: milestoneNumber,
+		milestone: milestone.number,
 	} );
 
 	if ( ! milestoneAssigned ) {
 		debug(
-			`pullRequestReviewHandler: Could not assign milestone [${ milestoneNumber }] to pull request [${ pullNumber }].`
+			`assign-milestone: Could not assign milestone [${ milestone.number }] to pull request [${ pullNumber }].`
 		);
 	}
 };
