@@ -27,7 +27,7 @@ jobs:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
                   # This can be a comma delimited list of automations to run, in this case we're just executing assign-milestone
                   automations: assign-milestone
-                  inputs:
+                  config:
                       # one of ignore, minor, or major
                       bump_strategy: 'ignore'
 ```

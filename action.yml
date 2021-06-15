@@ -1,15 +1,19 @@
 name: Project management automations
 author: Darren Ethier
 description: >
-  Various automations to assist with project management of a repository.
+    Various automations to assist with project management of a repository.
 inputs:
-  github_token:
-    description: Secret GitHub API token to use for making API requests.
-    required: true
-  automations:
-    description: A list of specific automations you want to run if you don't want to use them all in a given workflow. If not included, all of the current automations will run.
-    required: false
-    default: ''
+    github_token:
+        description: Secret GitHub API token to use for making API requests.
+        required: true
+    automations:
+        description: A list of specific automations you want to run if you don't want to use them all in a given workflow. If not included, all of the current automations will run.
+        required: false
+        default: ''
+    config:
+        description: A list of config parameters to pass to the automation (if supported).
+        required: false
+        default: ''
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+    using: 'node12'
+    main: 'dist/index.js'
