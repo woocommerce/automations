@@ -10,4 +10,4 @@ jobs:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
                   automations: assign-milestone
                   inputs:
-                      bump_strategy: ignore
+                      bump_strategy: 'ignore'

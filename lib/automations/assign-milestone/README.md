@@ -29,7 +29,7 @@ jobs:
                   automations: assign-milestone
                   inputs:
                       # one of ignore, minor, or major
-                      bump_strategy: ignore
+                      bump_strategy: 'ignore'
 ```
 
 ## API
