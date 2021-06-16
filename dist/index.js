@@ -35,26 +35,47 @@ module.exports = [
 /**
  * External dependencies
  */
-const { setFailed, getInput, debug: coreDebug } = __webpack_require__( 2186 );
+const { setFailed, getInput: coreGetInput } = __webpack_require__( 2186 );
 
-const allowedBumpStrategy = [ 'minor', 'ignore', 'major' ];
+const inputs = {
+	bumpStrategy: {
+		input: 'milestone_bump_strategy',
+		allowed: [ 'none', 'patch', 'minor', 'major' ],
+		default: 'minor',
+		required: false,
+	},
+};
 
-module.exports = async () => {
-	const config = {
-		bumpStrategy: getInput( 'bump_strategy' ) || 'minor',
-	};
+const getInput = ( input ) => {
+	const value = coreGetInput( input.input ) || input.default;
 
-	coreDebug( 'retrieved config: ' + JSON.stringify( config ) );
+	if ( input.required && ! value ) {
+		throw new Error( `Missing required input ${ input.input }` );
+	}
 
-	if ( ! config.bumpStrategy.includes( allowedBumpStrategy ) ) {
-		setFailed(
-			`assign-milestone: Invalid bumpStrategy provided. Allowed values: ${ JSON.stringify(
-				allowedBumpStrategy
+	if ( value && input.allowed && ! value.includes( input.allowed ) ) {
+		throw new Error(
+			`Input ${
+				input.input
+			} provided with value "${ value }" must be one of ${ JSON.stringify(
+				input.allowed
 			) }`
 		);
 	}
 
-	return config;
+	return value;
+};
+
+module.exports = async () => {
+	try {
+		const config = {
+			bumpStrategy: getInput( inputs.bumpStrategy ),
+		};
+
+		return config;
+	} catch ( error ) {
+		setFailed( `assign-milestone: ${ error }` );
+	}
 };
 
 
@@ -150,6 +171,28 @@ const getVersion = __webpack_require__( 6987 );
  * @typedef {import('../../typedefs').GitHub} GitHub
  */
 
+const getTargetMilestone = ( major, minor, patch, bumpStrategy = 'none' ) => {
+	if ( bumpStrategy === 'patch' ) {
+		patch += 1;
+		return `${ major }.${ minor }.${ patch }`;
+	}
+
+	if ( bumpStrategy === 'minor' ) {
+		if ( minor === 9 ) {
+			major += 1;
+			minor = 0;
+		} else {
+			minor += 1;
+		}
+	}
+
+	if ( bumpStrategy === 'major' ) {
+		major += 1;
+	}
+
+	return `${ major }.${ minor }`;
+};
+
 /**
  * @param {GitHubContext} context
  * @param {GitHub} octokit
@@ -185,26 +228,21 @@ module.exports = async ( context, octokit, config ) => {
 		return;
 	}
 
-	let [ major, minor ] = version.split( '.' ).map( Number );
+	const [ major = 0, minor = 0, patch = 0 ] = version
+		.split( '.' )
+		.map( Number );
 
 	debug(
-		`assign-milestone: Current plugin version is ${ major }.${ minor }`
+		`assign-milestone: Current plugin version is ${ major }.${ minor }.${ patch }`
 	);
 
-	console.log( config );
 	// Calculate next milestone
-	if ( config.bumpStrategy === 'minor' ) {
-		if ( minor === 9 ) {
-			major += 1;
-			minor = 0;
-		} else {
-			minor += 1;
-		}
-	} else if ( config.bumpStrategy === 'major' ) {
-		major += 1;
-	}
-
-	const nextMilestone = `${ major }.${ minor }`;
+	const nextMilestone = getTargetMilestone(
+		major,
+		minor,
+		patch,
+		config.bumpStrategy
+	);
 
 	// Get next milestone
 	const milestone = await getMilestoneByTitle(

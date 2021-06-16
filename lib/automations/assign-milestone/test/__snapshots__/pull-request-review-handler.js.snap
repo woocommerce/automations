@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`pull-request-review-handler assigns milestones to pull requests assigns a milestone to an approved pull request 1`] = `
+exports[`pull-request-review-handler assigns milestone assigns a milestone to an approved pull request 1`] = `
 Array [
   Object {
     "issue_number": 40,
@@ -11,18 +11,7 @@ Array [
 ]
 `;
 
-exports[`pull-request-review-handler assigns milestones to pull requests ignore bumpStrategy 1`] = `
-Array [
-  Object {
-    "issue_number": 40,
-    "milestone": 300,
-    "owner": "nerrad",
-    "repo": "tests",
-  },
-]
-`;
-
-exports[`pull-request-review-handler assigns milestones to pull requests major bumpStrategy 1`] = `
+exports[`pull-request-review-handler assigns milestone based on bumpStrategy major 1`] = `
 Array [
   Object {
     "issue_number": 40,
@@ -33,11 +22,33 @@ Array [
 ]
 `;
 
-exports[`pull-request-review-handler assigns milestones to pull requests minor bumpStrategy 1`] = `
+exports[`pull-request-review-handler assigns milestone based on bumpStrategy minor 1`] = `
 Array [
   Object {
     "issue_number": 40,
     "milestone": 310,
+    "owner": "nerrad",
+    "repo": "tests",
+  },
+]
+`;
+
+exports[`pull-request-review-handler assigns milestone based on bumpStrategy none 1`] = `
+Array [
+  Object {
+    "issue_number": 40,
+    "milestone": 300,
+    "owner": "nerrad",
+    "repo": "tests",
+  },
+]
+`;
+
+exports[`pull-request-review-handler assigns milestone based on bumpStrategy patch 1`] = `
+Array [
+  Object {
+    "issue_number": 40,
+    "milestone": 301,
     "owner": "nerrad",
     "repo": "tests",
   },
