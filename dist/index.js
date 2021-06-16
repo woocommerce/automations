@@ -141,7 +141,7 @@ module.exports = async ( context, octokit ) => {
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const runner = __webpack_require__( 2433 );
-const { getConfig } = __webpack_require__( 5783 );
+const getConfig = __webpack_require__( 5783 );
 
 module.exports = {
 	name: 'assign-milestone',
