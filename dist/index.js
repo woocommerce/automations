@@ -208,8 +208,8 @@ module.exports = async ( context, octokit, config ) => {
 
 	// Check state
 	if ( reviewState !== 'approved' ) {
-		//debug( `assign-milestone: Review state is not approved--bailing.` );
-		//return;
+		debug( `assign-milestone: Review state is not approved--bailing.` );
+		return;
 	}
 
 	// Check current milestone
