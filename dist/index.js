@@ -53,7 +53,7 @@ const getInput = ( input ) => {
 		throw new Error( `Missing required input ${ input.input }` );
 	}
 
-	if ( value && input.allowed && ! value.includes( input.allowed ) ) {
+	if ( value && input.allowed && ! input.allowed.includes( value ) ) {
 		throw new Error(
 			`Input ${
 				input.input
