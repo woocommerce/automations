@@ -119,6 +119,7 @@ exports.gimmeOctokit = () => {
 								{
 									data: [
 										{ title: '3.0.0', number: 300 },
+										{ title: '3.0.1', number: 301 },
 										{ title: '3.1.0', number: 310 },
 										{ title: '4.0.0', number: 400 },
 									],

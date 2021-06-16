@@ -3,9 +3,12 @@
 When a pull request is approved and is not already assigned a milestone, this automation will assign the next milestone to it
 automatically.
 
-The next milestone will be calculated from the current version in package.json. So for example, if the current version is 2.5.2, the milestone will be 2.6 (if it exists) by default.
+The next milestone will be calculated from the current version in package.json. By default this will be the next minor version, but setting `milestone_bump_strategy` can change this:
 
-Setting a `bump_strategy` to `ignore` will use the version found in package.json. `major` will increase the major version.
+-   `none` - Assign to the current major.minor version.
+-   `patch` - Assign to the next patch version.
+-   `minor` - Assign to the next minor version.
+-   `major` - Assign to the next major version.
 
 ## Usage
 
@@ -27,9 +30,7 @@ jobs:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
                   # This can be a comma delimited list of automations to run, in this case we're just executing assign-milestone
                   automations: assign-milestone
-                  config:
-                      # one of ignore, minor, or major
-                      bump_strategy: 'ignore'
+                  milestone_bump_strategy: none
 ```
 
 ## API
@@ -38,6 +39,7 @@ jobs:
 
 -   `github_token`: Required. GitHub API token to use for making API requests. You can use the default `secrets.GITHUB_TOKEN` used by GitHub actions or store a different one in the secrets configuration of your GitHub repository.
 -   `automations`: Optional. You can include a comma-delimited list of specific automations you want to run if you don't want to use them all in a given workflow.
+-   `milestone_bump_strategy`: Optional. For the assign-milestone workflow, this controls which milestone is selected.
 
 ### Outputs
 

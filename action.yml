@@ -7,13 +7,19 @@ inputs:
         description: Secret GitHub API token to use for making API requests.
         required: true
     automations:
-        description: A list of specific automations you want to run if you don't want to use them all in a given workflow. If not included, all of the current automations will run.
+        description: |
+            A list of specific automations you want to run if you don't want to use them all in a given workflow. If not included, all of the current automations will run.
         required: false
         default: ''
-    config:
-        description: A list of config parameters to pass to the automation (if supported).
+    milestone_bump_strategy:
+        description: |
+            For the assign-milestone workflow, this controls which milestone is selected based on the version in package.json:
+                'none'  - Assign to the current major.minor version.
+                'patch' - Assign to the next patch version.
+                'minor' - Assign to the next minor version.
+                'major' - Assign to the next major version.
         required: false
-        default: ''
+        default: minor
 runs:
     using: 'node12'
     main: 'dist/index.js'
