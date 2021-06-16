@@ -68,11 +68,9 @@ const getInput = ( input ) => {
 
 module.exports = async () => {
 	try {
-		const config = {
+		return {
 			bumpStrategy: getInput( inputs.bumpStrategy ),
 		};
-
-		return config;
 	} catch ( error ) {
 		setFailed( `assign-milestone: ${ error }` );
 	}
@@ -202,6 +200,9 @@ module.exports = async ( context, octokit, config ) => {
 	const pullNumber = context.payload.pull_request.number;
 	const reviewState = context.payload.review.state;
 
+	debug(
+		`assign-milestone: Received config [${ JSON.stringify( config ) }].`
+	);
 	debug( `assign-milestone: Pull Request number is [${ pullNumber }].` );
 	debug( `assign-milestone: Review state is [${ reviewState }].` );
 
