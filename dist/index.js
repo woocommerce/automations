@@ -29,6 +29,56 @@ module.exports = [
 
 /***/ }),
 
+/***/ 5783:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+/**
+ * External dependencies
+ */
+const { setFailed, getInput: coreGetInput } = __webpack_require__( 2186 );
+
+const inputs = {
+	bumpStrategy: {
+		input: 'milestone_bump_strategy',
+		allowed: [ 'none', 'patch', 'minor', 'major' ],
+		default: 'minor',
+		required: false,
+	},
+};
+
+const getInput = ( input ) => {
+	const value = coreGetInput( input.input ) || input.default;
+
+	if ( input.required && ! value ) {
+		throw new Error( `Missing required input ${ input.input }` );
+	}
+
+	if ( value && input.allowed && ! input.allowed.includes( value ) ) {
+		throw new Error(
+			`Input ${
+				input.input
+			} provided with value "${ value }" must be one of ${ JSON.stringify(
+				input.allowed
+			) }`
+		);
+	}
+
+	return value;
+};
+
+module.exports = async () => {
+	try {
+		return {
+			bumpStrategy: getInput( inputs.bumpStrategy ),
+		};
+	} catch ( error ) {
+		setFailed( `assign-milestone: ${ error }` );
+	}
+};
+
+
+/***/ }),
+
 /***/ 6987:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -91,12 +141,14 @@ module.exports = async ( context, octokit ) => {
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const runner = __webpack_require__( 2433 );
+const getConfig = __webpack_require__( 5783 );
 
 module.exports = {
 	name: 'assign-milestone',
 	events: [ 'pull_request_review' ],
 	actions: [ 'submitted', 'edited' ],
 	runner,
+	getConfig,
 };
 
 
@@ -117,14 +169,40 @@ const getVersion = __webpack_require__( 6987 );
  * @typedef {import('../../typedefs').GitHub} GitHub
  */
 
+const getTargetMilestone = ( major, minor, patch, bumpStrategy = 'none' ) => {
+	if ( bumpStrategy === 'patch' ) {
+		patch += 1;
+		return `${ major }.${ minor }.${ patch }`;
+	}
+
+	if ( bumpStrategy === 'minor' ) {
+		if ( minor === 9 ) {
+			major += 1;
+			minor = 0;
+		} else {
+			minor += 1;
+		}
+	}
+
+	if ( bumpStrategy === 'major' ) {
+		major += 1;
+	}
+
+	return `${ major }.${ minor }`;
+};
+
 /**
  * @param {GitHubContext} context
  * @param {GitHub} octokit
+ * @param {Object} config
  */
-module.exports = async ( context, octokit ) => {
+module.exports = async ( context, octokit, config ) => {
 	const pullNumber = context.payload.pull_request.number;
 	const reviewState = context.payload.review.state;
 
+	debug(
+		`assign-milestone: Received config [${ JSON.stringify( config ) }].`
+	);
 	debug( `assign-milestone: Pull Request number is [${ pullNumber }].` );
 	debug( `assign-milestone: Review state is [${ reviewState }].` );
 
@@ -151,21 +229,21 @@ module.exports = async ( context, octokit ) => {
 		return;
 	}
 
-	let [ major, minor ] = version.split( '.' ).map( Number );
+	const [ major = 0, minor = 0, patch = 0 ] = version
+		.split( '.' )
+		.map( Number );
 
 	debug(
-		`assign-milestone: Current plugin version is ${ major }.${ minor }`
+		`assign-milestone: Current plugin version is ${ major }.${ minor }.${ patch }`
 	);
 
 	// Calculate next milestone
-	if ( minor === 9 ) {
-		major += 1;
-		minor = 0;
-	} else {
-		minor += 1;
-	}
-
-	const nextMilestone = `${ major }.${ minor }`;
+	const nextMilestone = getTargetMilestone(
+		major,
+		minor,
+		patch,
+		config.bumpStrategy
+	);
 
 	// Get next milestone
 	const milestone = await getMilestoneByTitle(
@@ -251,14 +329,15 @@ const getRunnerTask = ( eventName, action ) => {
  *
  * @param {GitHubContext} context Context for the job run (github).
  * @param {GitHub}        octokit GitHub api helper.
+ * @param {Object}        config  Config object.
  *
  * @return {AutomationTaskRunner} task runner.
  */
-const runner = async ( context, octokit ) => {
+const runner = async ( context, octokit, config ) => {
 	const task = getRunnerTask( context.eventName, context.payload.action );
 	if ( typeof task === 'function' ) {
 		debug( `assignMilestoneRunner: Executing the ${ task.name } task.` );
-		await task( context, octokit );
+		await task( context, octokit, config );
 	} else {
 		setFailed(
 			`assignMilestoneRunner: There is no configured task for the event = '${ context.eventName }' and the payload action = '${ context.payload.action }'`
@@ -2140,7 +2219,9 @@ const automations = __webpack_require__( 9407 );
 		);
 		return;
 	}
+
 	const token = getInput( 'github_token' );
+
 	if ( ! token ) {
 		setFailed( 'initialize: Input `github_token` is required' );
 		return;
