@@ -1,6 +1,8 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 
+const releaseListPayload = require( '@testFixtures/payloads/release-list.json' );
+
 const loadDiff = ( exports.loadDiff = ( filename ) => {
 	return Promise.resolve( {
 		data: fs.readFileSync(
@@ -103,6 +105,16 @@ exports.gimmeOctokit = () => {
 				.fn( () => Promise.resolve( { data: { content: '' } } ) )
 				.mockName( 'repos.getContent' ),
 			getBranch: jest.fn().mockName( 'repos.getBranch' ),
+			listReleases: jest
+				.fn( () =>
+					Promise.resolve( {
+						data: releaseListPayload,
+					} )
+				)
+				.mockName( 'repos.listReleases' ),
+			updateRelease: jest
+				.fn( () => Promise.resolve( {} ) )
+				.mockName( 'repos.updateRelease' ),
 		},
 		pulls: {
 			get: jest.fn( () => loadDiff( 'basic' ) ).mockName( 'pulls.get' ),
