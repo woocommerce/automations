@@ -350,6 +350,63 @@ module.exports = runner;
 
 /***/ }),
 
+/***/ 8926:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+const { setFailed } = __webpack_require__( 2186 );
+
+/**
+ * @typedef {import('../../typedefs').GitHubContext} GitHubContext
+ * @typedef {import('../../typedefs').GitHub} GitHub
+ * @typedef {import('../../typedefs').ReleaseConfig} ReleaseConfig
+ */
+
+/**
+ * @param {GitHubContext} context
+ * @param {GitHub} octokit
+ * @param {ReleaseConfig} config
+ */
+exports.attachChangelogHandler = async ( context, octokit, config ) => {
+	const release = context.payload.release;
+
+	const { owner, repo } = context.repo;
+
+	const pullRequests = await octokit.search.issuesAndPullRequests( {
+		q: `${ `is:pr Release: 7.3.0 in:title repo:woocommerce/woocommerce-gutenberg-products-block` }`,
+	} );
+
+	if (
+		pullRequests.data.items.length === 0 ||
+		pullRequests.data.items.length > 1
+	) {
+		setFailed(
+			`Missing PR associated with the release ${ release.tag_name }`
+		);
+	}
+
+	const pullRequest = await octokit.pulls.get( {
+		owner: 'woocommerce',
+		repo: 'woocommerce-gutenberg-products-block',
+		pull_number: pullRequests.data.items[ 0 ].number,
+	} );
+
+	console.log(
+		'ci entro1',
+		pullRequest.data.body.match( /```([\s\S]*?)```/gm )[ 0 ]
+	);
+
+	await octokit.repos.updateRelease( {
+		...context.repo,
+		release_id: release.id,
+		body: pullRequest.data.body
+			.match( /```([\s\S]*?)```/gm )[ 0 ]
+			.replace( /```/gm, '' ),
+	} );
+};
+
+
+/***/ }),
+
 /***/ 462:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -744,7 +801,7 @@ const { getConfig } = __webpack_require__( 1154 );
 
 module.exports = {
 	name: 'release',
-	events: [ 'create' ],
+	events: [ 'create', 'release' ],
 	runner,
 	getConfig,
 };
@@ -765,6 +822,9 @@ const { setFailed, debug: coreDebug } = __webpack_require__( 2186 );
  * Internal dependencies
  */
 const branchCreateHandler = __webpack_require__( 462 );
+const {
+	attachChangelogHandler,
+} = __webpack_require__( 8926 );
 
 /**
  * @typedef {import('@actions/github').GitHub} GitHub
@@ -775,6 +835,9 @@ const branchCreateHandler = __webpack_require__( 462 );
 
 const runnerMatrix = {
 	create: branchCreateHandler,
+	release: {
+		published: attachChangelogHandler,
+	},
 };
 
 /**
