@@ -350,6 +350,57 @@ module.exports = runner;
 
 /***/ }),
 
+/***/ 8926:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+const { setFailed } = __webpack_require__( 2186 );
+
+/**
+ * @typedef {import('../../typedefs').GitHubContext} GitHubContext
+ * @typedef {import('../../typedefs').GitHub} GitHub
+ * @typedef {import('../../typedefs').ReleaseConfig} ReleaseConfig
+ */
+
+/**
+ * @param {GitHubContext} context
+ * @param {GitHub} octokit
+ * @param {ReleaseConfig} config
+ */
+exports.attachChangelogHandler = async ( context, octokit, config ) => {
+	const release = context.payload.release;
+
+	const { owner, repo } = context.repo;
+
+	const pullRequests = octokit.rest.search.issuesAndPullRequests( {
+		q: `q=${ encodeURIComponent(
+			`is:pr is:closed Release: ${ release.tag_name } in:title`
+		) }`,
+	} );
+
+	if ( pullRequests.length === 0 || pullRequests.data.items.length > 1 ) {
+		setFailed( '' );
+	}
+
+	const pullRequestNumber = await octokit.rest.pullRequest( {
+		id: pullRequests.data.items[ 0 ].number,
+	} );
+
+	const pullRequest = await octokit.rest.pulls.get( {
+		owner,
+		repo,
+		pull_number: pullRequestNumber,
+	} )[ 0 ];
+
+	await octokit.repos.updateRelease( {
+		...context.repo,
+		release_id: release.id,
+		body: pullRequest.body,
+	} );
+};
+
+
+/***/ }),
+
 /***/ 462:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -744,7 +795,7 @@ const { getConfig } = __webpack_require__( 1154 );
 
 module.exports = {
 	name: 'release',
-	events: [ 'create' ],
+	events: [ 'create', 'release' ],
 	runner,
 	getConfig,
 };
@@ -765,6 +816,9 @@ const { setFailed, debug: coreDebug } = __webpack_require__( 2186 );
  * Internal dependencies
  */
 const branchCreateHandler = __webpack_require__( 462 );
+const {
+	attachChangelogHandler,
+} = __webpack_require__( 8926 );
 
 /**
  * @typedef {import('@actions/github').GitHub} GitHub
@@ -775,6 +829,7 @@ const branchCreateHandler = __webpack_require__( 462 );
 
 const runnerMatrix = {
 	create: branchCreateHandler,
+	release: attachChangelogHandler,
 };
 
 /**
