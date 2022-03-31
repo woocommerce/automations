@@ -1,8 +1,6 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 
-const releaseListPayload = require( '@testFixtures/payloads/release-list.json' );
-
 const loadDiff = ( exports.loadDiff = ( filename ) => {
 	return Promise.resolve( {
 		data: fs.readFileSync(
@@ -113,7 +111,7 @@ exports.gimmeOctokit = () => {
 			listReleases: jest
 				.fn( () =>
 					Promise.resolve( {
-						data: releaseListPayload,
+						data: require( '@testFixtures/payloads/release-list.json' ),
 					} )
 				)
 				.mockName( 'repos.listReleases' ),
