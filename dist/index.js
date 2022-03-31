@@ -362,7 +362,8 @@ const { setFailed } = __webpack_require__( 2186 );
  */
 
 /**
- * Extract only the changelog from the PR body
+ * Extract only the changelog from the PR body.
+ * Extract the content that is wrapped between backtips.
  * @param {string} pullRequestBody
  */
 const parsePullRequestBody = ( pullRequestBody ) => {
@@ -382,10 +383,10 @@ const parsePullRequestBody = ( pullRequestBody ) => {
  */
 exports.attachChangelogHandler = async ( context, octokit ) => {
 	const release = context.payload.release;
-	const { repo, owner } = context;
+	const { repo } = context;
 
 	const pullRequests = await octokit.search.issuesAndPullRequests( {
-		q: `${ `is:pr Release: ${ release.name } in:title ${ repo }` }`,
+		q: `is:pr Release: ${ release.name } in:title repo:"${ repo.owner }/${ repo.repo }"`,
 	} );
 
 	if (
@@ -398,13 +399,12 @@ exports.attachChangelogHandler = async ( context, octokit ) => {
 	}
 
 	const pullRequest = await octokit.pulls.get( {
-		repo,
-		owner,
+		...repo,
 		pull_number: pullRequests.data.items[ 0 ].number,
 	} );
 
 	await octokit.repos.updateRelease( {
-		repo,
+		...repo,
 		release_id: release.id,
 		body: parsePullRequestBody( pullRequest.data.body ),
 	} );
