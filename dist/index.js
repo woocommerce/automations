@@ -362,40 +362,51 @@ const { setFailed } = __webpack_require__( 2186 );
  */
 
 /**
+ * Extract only the changelog from the PR body
+ * @param {string} pullRequestBody
+ */
+const parsePullRequestBody = ( pullRequestBody ) => {
+	const body = pullRequestBody.match( /```([\s\S]*?)```/gm );
+
+	if ( ! body || body.length === 0 ) {
+		return pullRequestBody;
+	}
+
+	return body[ 0 ].replace( /```/gm, '' );
+};
+
+/**
  * @param {GitHubContext} context
  * @param {GitHub} octokit
  * @param {ReleaseConfig} config
  */
 exports.attachChangelogHandler = async ( context, octokit ) => {
 	const release = context.payload.release;
-
-	console.log( JSON.stringify( release, 4 ) );
+	const { repo, owner } = context;
 
 	const pullRequests = await octokit.search.issuesAndPullRequests( {
-		q: `${ `is:pr Release: 7.3.0 in:title repo:woocommerce/woocommerce-gutenberg-products-block` }`,
+		q: `${ `is:pr Release: ${ release.name } in:title ${ repo }` }`,
 	} );
 
 	if (
 		pullRequests.data.items.length === 0 ||
 		pullRequests.data.items.length > 1
 	) {
-		setFailed(
-			`Missing PR associated with the release ${ release.tag_name }`
+		return setFailed(
+			`Missing PR associated with the release ${ release.name } with tag ${ release.tag_name }`
 		);
 	}
 
 	const pullRequest = await octokit.pulls.get( {
-		owner: 'woocommerce',
-		repo: 'woocommerce-gutenberg-products-block',
+		repo,
+		owner,
 		pull_number: pullRequests.data.items[ 0 ].number,
 	} );
 
 	await octokit.repos.updateRelease( {
-		...context.repo,
+		repo,
 		release_id: release.id,
-		body: pullRequest.data.body
-			.match( /```([\s\S]*?)```/gm )[ 0 ]
-			.replace( /```/gm, '' ),
+		body: parsePullRequestBody( pullRequest.data.body ),
 	} );
 };
 
