@@ -91,7 +91,12 @@ exports.gimmeOctokit = () => {
 		search: {
 			issuesAndPullRequests: jest
 				.fn( () =>
-					Promise.resolve( { data: { total_count: 0, items: [] } } )
+					Promise.resolve( {
+						data: {
+							total_count: 0,
+							items: require( './fixtures/payloads/pull_requests.json' ),
+						},
+					} )
 				)
 				.mockName( 'search.issuesAndPullRequests' ),
 		},
@@ -103,6 +108,16 @@ exports.gimmeOctokit = () => {
 				.fn( () => Promise.resolve( { data: { content: '' } } ) )
 				.mockName( 'repos.getContent' ),
 			getBranch: jest.fn().mockName( 'repos.getBranch' ),
+			listReleases: jest
+				.fn( () =>
+					Promise.resolve( {
+						data: require( '@testFixtures/payloads/release-list.json' ),
+					} )
+				)
+				.mockName( 'repos.listReleases' ),
+			updateRelease: jest
+				.fn( () => Promise.resolve( {} ) )
+				.mockName( 'repos.updateRelease' ),
 		},
 		pulls: {
 			get: jest.fn( () => loadDiff( 'basic' ) ).mockName( 'pulls.get' ),
