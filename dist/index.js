@@ -595,7 +595,6 @@ const branchHandler = async ( context, octokit, config ) => {
 		return;
 	}
 
-	debug( JSON.stringify( context ) );
 	const readmeResponse = await octokit.repos.getContent({
 		...context.repo,
 		path: 'readme.txt',
@@ -3198,8 +3197,9 @@ const getTestingInstructions = async ( context, octokit, milestoneTitle, config 
 	);
 	const featurePluginPrIds = featurePluginPrs.map( ( pr ) => pr.number );
 	const allAssignedPrIds = [ ...corePrIds, ...featurePluginPrIds, ...experimentalPrIds, ...excludeFromTestingInstructionsPrIds ];
-	const prsWithNoTestingCategory = allPrIds.filter( ( id ) => ! allAssignedPrIds.includes( id ) );
-	const unaccountedForPrMessage = prsWithNoTestingCategory.length > 0 ? `### ⚠️ Warning - The following PRs do not have any testing category assigned. Please check the PR body to verify it should/should not be included in the testing instructions.\n#${ prsWithNoTestingCategory.join('\n\n#') }` : '';
+	const htmlUrl = context.payload.repository.html_url;
+	const prsWithNoTestingCategory = allPrIds.filter( ( id ) => ! allAssignedPrIds.includes( id ) ).map( ( id ) => `[#${ id }]( ${ htmlUrl }/pulls/${ id })` );
+	const unaccountedForPrMessage = prsWithNoTestingCategory.length > 0 ? `### ⚠️ Warning - PRs ${ prsWithNoTestingCategory.join(', ') } do not have any testing category assigned. Please check the PR body to verify it should/should not be included in the testing instructions.` : '';
 	const getChangelogEntry = (0,_changelog__WEBPACK_IMPORTED_MODULE_0__.getEntry)( config );
 	const changelogWithPrIds = Object.fromEntries(
 		[ ...corePrs, ...featurePluginPrs ].map(
@@ -3207,7 +3207,7 @@ const getTestingInstructions = async ( context, octokit, milestoneTitle, config 
 		)
 	);
 
-	const prTestingInstructionsMapFunc = ( pr ) => extractTestingInstructions( pr, changelogWithPrIds );
+	const prTestingInstructionsMapFunc = ( pr ) => extractTestingInstructions( pr, changelogWithPrIds, context );
 	const coreTestingInstructions = corePrs.map( prTestingInstructionsMapFunc ).join( '' );
 	const featurePluginTestingInstructions = featurePluginPrs.map( prTestingInstructionsMapFunc ).join( '' );
 	const formattedCoreTestingInstructions = corePrs.length > 0 ?  `\n## Feature Plugin and package inclusion in WooCommerce
@@ -3230,14 +3230,15 @@ ${ formattedCoreTestingInstructions }${ formattedFeaturePluginTestingInstruction
  * Gets the testing instructions section of a PR.
  * @param pr {PullRequest} The PR to get the instructions from.
  * @param changelog {object} Object keyed by PR ID and whose values are the changelog entries with links to the PR.
+ * @param htmlUrl {string} The HTML URL of the repository so we can hyperlink the PR numbers.
  * @return {string}
  */
-const extractTestingInstructions = ( pr, changelog ) => {
+const extractTestingInstructions = ( pr, changelog, htmlUrl ) => {
 	const { body: prBody } = pr;
 	const prBodyWithoutComments = prBody.replace( /(<!--.*?-->)|(<!--[\S\s]+?-->)|(<!--[\S\s]*?$)/g, '' );
 	const regex = /### User Facing Testing(.*)\* \[ ] Do not include in the testing notes/mis;
 	const matches = prBodyWithoutComments.match( regex );
-	const error = `### ⚠️ PR [#${ pr.number }](${ pr.url }) testing instructions could not be parsed. Please check it!\n\n`
+	const error = `### ⚠️ PR [#${ pr.number }'s](${ htmlUrl }/pulls/${ pr.number }) testing instructions could not be parsed. Please check it!\n\n`
 	if ( ! matches || ! matches[ 1 ] ) {
 		debug( error );
 		return error;
