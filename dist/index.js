@@ -3207,7 +3207,7 @@ const getTestingInstructions = async ( context, octokit, milestoneTitle, config 
 		)
 	);
 
-	const prTestingInstructionsMapFunc = ( pr ) => extractTestingInstructions( pr, changelogWithPrIds, context );
+	const prTestingInstructionsMapFunc = ( pr ) => extractTestingInstructions( pr, changelogWithPrIds, htmlUrl );
 	const coreTestingInstructions = corePrs.map( prTestingInstructionsMapFunc ).join( '' );
 	const featurePluginTestingInstructions = featurePluginPrs.map( prTestingInstructionsMapFunc ).join( '' );
 	const formattedCoreTestingInstructions = corePrs.length > 0 ?  `\n## Feature Plugin and package inclusion in WooCommerce
