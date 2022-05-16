@@ -3198,7 +3198,7 @@ const getTestingInstructions = async ( context, octokit, milestoneTitle, config 
 	const featurePluginPrIds = featurePluginPrs.map( ( pr ) => pr.number );
 	const allAssignedPrIds = [ ...corePrIds, ...featurePluginPrIds, ...experimentalPrIds, ...excludeFromTestingInstructionsPrIds ];
 	const htmlUrl = context.payload.repository.html_url;
-	const prsWithNoTestingCategory = allPrIds.filter( ( id ) => ! allAssignedPrIds.includes( id ) ).map( ( id ) => `[#${ id }]( ${ htmlUrl }/pulls/${ id })` );
+	const prsWithNoTestingCategory = allPrIds.filter( ( id ) => ! allAssignedPrIds.includes( id ) ).map( ( id ) => `[#${ id }](${ htmlUrl }/pulls/${ id })` );
 	const unaccountedForPrMessage = prsWithNoTestingCategory.length > 0 ? `### ⚠️ Warning - PRs ${ prsWithNoTestingCategory.join(', ') } do not have any testing category assigned. Please check the PR body to verify it should/should not be included in the testing instructions.` : '';
 	const getChangelogEntry = (0,_changelog__WEBPACK_IMPORTED_MODULE_0__.getEntry)( config );
 	const changelogWithPrIds = Object.fromEntries(
