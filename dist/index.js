@@ -3239,7 +3239,7 @@ const extractTestingInstructions = ( pr, changelog, htmlUrl ) => {
 	const regex = /### User Facing Testing(.*)\* \[ ] Do not include in the testing notes/mis;
 	const matches = prBodyWithoutComments.match( regex );
 	const error = `### ⚠️ PR [#${ pr.number }'s](${ htmlUrl }/pull/${ pr.number }) testing instructions could not be parsed. Please check it!\n\n`
-	if ( ! matches || ! matches[ 1 ] ) {
+	if ( ! matches || ! matches[ 1 ] || ! matches[1].trim() ) {
 		debug( error );
 		return error;
 	}
