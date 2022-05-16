@@ -3169,33 +3169,36 @@ const debug = __webpack_require__( 5800 );
  */
 const getTestingInstructions = async ( context, octokit, milestoneTitle, config ) => {
 	const prList = await fetchAllPullRequests( context, octokit, milestoneTitle);
+	const allPrIds = prList.map( ( pr ) => pr.number );
 
 	const doNotIncludeInTestingInstructionsPrs = getPrsMatchingText(
 		prList,
 		( body ) => body.includes( '* [x] Do not include in the Testing Notes' ),
 	);
-	const excludeFromTestingInstructionsIds = doNotIncludeInTestingInstructionsPrs.map( (pr) => pr.number );
+	const excludeFromTestingInstructionsPrIds = doNotIncludeInTestingInstructionsPrs.map( (pr) => pr.number );
 
 	const experimentalPrs = getPrsMatchingText(
 		prList,
 		( body ) => body.includes( '* [x] Experimental' ),
-		excludeFromTestingInstructionsIds,
+		excludeFromTestingInstructionsPrIds,
 	);
 	const experimentalPrIds = experimentalPrs.map( ( pr ) => pr.number );
-
 
 	const corePrs = getPrsMatchingText(
 		prList,
 		( body ) => body.includes( '* [x] WooCommerce Core' ),
-		excludeFromTestingInstructionsIds,
+		excludeFromTestingInstructionsPrIds,
 	);
 	const corePrIds = corePrs.map( ( pr ) => pr.number );
 	const featurePluginPrs = getPrsMatchingText(
 		prList,
 		( body ) => body.includes( '* [x] Feature plugin' ),
-		[...excludeFromTestingInstructionsIds, corePrIds, ...experimentalPrIds ],
+		[...excludeFromTestingInstructionsPrIds, ...corePrIds, ...experimentalPrIds ],
 	);
-
+	const featurePluginPrIds = featurePluginPrs.map( ( pr ) => pr.number );
+	const allAssignedPrIds = [ ...corePrIds, ...featurePluginPrIds, experimentalPrIds, excludeFromTestingInstructionsPrIds ];
+	const prsWithNoTestingCategory = allPrIds.filter( ( id ) => ! [ ...corePrIds, ...experimentalPrIds, ...featurePluginPrIds ].includes( id ) );
+	const unaccountedForPrMessage = prsWithNoTestingCategory.length > 0 ? `# ⚠️ Warning - PRs #${ prsWithNoTestingCategory.join(', #') } do not have any testing category assigned. Please check the PR body to verify it should/should not be included in the testing instructions.` : '';
 	const getChangelogEntry = (0,_changelog__WEBPACK_IMPORTED_MODULE_0__.getEntry)( config );
 	const changelogWithPrIds = Object.fromEntries(
 		[ ...corePrs, ...featurePluginPrs ].map(
@@ -3218,7 +3221,7 @@ ${ featurePluginTestingInstructions }` : '';
 	return `## Testing notes and ZIP for release ${ milestoneTitle }
 
 Zip file for testing: [insert link to built zip here]
-${ formattedCoreTestingInstructions }${ formattedFeaturePluginTestingInstructions }
+${ formattedCoreTestingInstructions }${ formattedFeaturePluginTestingInstructions }${ unaccountedForPrMessage };
 `;
 };
 
