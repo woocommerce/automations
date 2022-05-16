@@ -439,6 +439,7 @@ const {
 	getChangelogItems,
 	getDevNoteItems,
 } = __webpack_require__( 2450 );
+const {getTestingInstructions} = __webpack_require__(7192);
 
 /**
  * @typedef {import('../../typedefs').GitHubContext} GitHubContext
@@ -455,7 +456,10 @@ const {
  */
 const insertNewChangelogEntry = ( contents, changelog, releaseVersion ) => {
 	const regex = /== Changelog ==\n/;
-	return contents.replace( regex, `== Changelog ==\n\n= ${ releaseVersion } - ${ new Date().toISOString().split('T')[0] } =\n\n${ changelog }`);
+	return contents.replace(
+		regex,
+		`== Changelog ==\n\n= ${ releaseVersion } - ${ new Date().toISOString().split('T')[0] } =\n\n${ changelog }`
+	);
 }
 /**
  * @param {GitHubContext} context
@@ -621,6 +625,58 @@ const branchHandler = async ( context, octokit, config ) => {
 
 	if ( ! updatedReadmeCommit ) {
 		debug( `releaseAutomation: Automatic update of readme failed.` );
+		return;
+	}
+
+	const testingInstructionsIndexResponse = await octokit.repos.getContent({
+		...context.repo,
+		path: 'docs/testing/releases/README.md',
+	});
+	if ( ! testingInstructionsIndexResponse ) {
+		debug( `releaseAutomation: Could not read docs/testing/releases/README.md file from repository.` );
+		return;
+	}
+	// Content comes from GH API in base64 so convert it to utf-8 string.
+	const testingInstructionsIndexBuffer = new Buffer.from( readmeResponse.data.content, 'base64' );
+	const testingInstructionsIndexContents = testingInstructionsIndexBuffer.toString( 'utf-8' );
+
+	// Need to convert back to base64 to write to the repo.
+	const updatedTestingInstructions = testingInstructionsIndexContents.replace(
+		'\n<!-- FEEDBACK -->',
+		`- [${ releaseVersion }](./${ releaseVersion.replace( /\./g, '') }.md)\n<!-- FEEDBACK -->`
+	);
+
+	const updatedTestingInstructionsIndexBuffer = new Buffer.from( updatedTestingInstructions, 'utf-8' );
+	const updatedTestingInstructionsContent = updatedTestingInstructionsIndexBuffer.toString( 'base64' );
+
+	const updatedReadmeCommitSha = updatedReadmeCommit.data.sha;
+	const updatedTestingInstructionsIndexCommit = await octokit.repos.createOrUpdateFileContents({
+		...context.repo,
+		message: 'Update testing instructions in docs/testing/releases/README.md',
+		path: 'docs/testing/releases/README.md',
+		content: updatedTestingInstructionsContent,
+		sha: updatedReadmeCommitSha,
+		branch: context.payload.ref,
+	});
+
+	if ( ! updatedTestingInstructionsIndexCommit ) {
+		debug( `releaseAutomation: Automatic update of docs/testing/releases/README.md failed.` );
+		return;
+	}
+
+	const testingInstructions = new Buffer.from( await getTestingInstructions( context, octokit, releaseVersion, config ), 'utf-8' );
+	debug( testingInstructions.toString() );
+	debug( testingInstructions.toString( 'base64') );
+	const releaseTestingInstructionsFilename = releaseVersion.replace(/\./g, '' );
+	const newTestingInstructionsCommit = await octokit.repos.createOrUpdateFileContents({
+		...context.repo,
+		message: `Add testing instructions for release ${ releaseVersion }`,
+		path: `docs/testing/releases/${ releaseTestingInstructionsFilename }.md`,
+		content: testingInstructions.toString( 'base64' ),
+		branch: context.payload.ref,
+	});
+	if ( ! newTestingInstructionsCommit ) {
+		debug( `releaseAutomation: Automatic creation of testing instructions failed.` );
 		return;
 	}
 
@@ -2887,6 +2943,8 @@ module.exports = {
 	getNormalizedTitle,
 	getIssueType,
 	sortGroup,
+	getEntry,
+	fetchAllPullRequests,
 	getTypesByLabels,
 	getTypesByTitle,
 	getChangelogItems,
@@ -2903,12 +2961,16 @@ module.exports = {
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 const {
+	fetchAllPullRequests,
+	getEntry,
 	getChangelog,
 	getDevNoteItems,
 	getChangelogItems,
 } = __webpack_require__( 7772 );
 
 module.exports = {
+	fetchAllPullRequests,
+	getEntry,
 	getChangelog,
 	getDevNoteItems,
 	getChangelogItems,
@@ -3069,6 +3131,130 @@ module.exports = {
 	getMilestoneByTitle,
 	getIssuesByMilestone,
 };
+
+
+/***/ }),
+
+/***/ 7192:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "getTestingInstructions": () => /* binding */ getTestingInstructions
+/* harmony export */ });
+/* harmony import */ var _changelog__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2450);
+/* harmony import */ var _changelog__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_changelog__WEBPACK_IMPORTED_MODULE_0__);
+/**
+ * Internal dependencies
+ */
+
+
+const {fetchAllPullRequests} = __webpack_require__(2450);
+const debug = __webpack_require__( 5800 );
+
+/**
+ * @typedef {import('@octokit/types').PullsGetResponseData} PullRequest
+ * @typedef {import('../typedefs').GitHub} GitHub
+ * @typedef {import('../typedefs').ReleaseConfig} ReleaseConfig
+ */
+
+/**
+ * Gets the testing instructions as a string for inclusion in the PR.
+ * @param {GitHubContext} context
+ * @param {GitHub} octokit
+ * @param {string} milestoneTitle The name of the milestone.
+ * @param {ReleaseConfig} config The release configuration.
+ * @return {Promise<string>} The testing instructions in a string.
+ */
+const getTestingInstructions = async ( context, octokit, milestoneTitle, config ) => {
+	const prList = await fetchAllPullRequests( context, octokit, milestoneTitle);
+
+	const doNotIncludeInTestingInstructionsPrs = getPrsMatchingText(
+		prList,
+		( body ) => body.includes( '* [x] Do not include in the Testing Notes' ),
+	);
+	const excludeFromTestingInstructionsIds = doNotIncludeInTestingInstructionsPrs.map( (pr) => pr.number );
+
+	const experimentalPrs = getPrsMatchingText(
+		prList,
+		( body ) => body.includes( '* [x] Experimental' ),
+		excludeFromTestingInstructionsIds,
+	);
+	const experimentalPrIds = experimentalPrs.map( ( pr ) => pr.number );
+
+
+	const corePrs = getPrsMatchingText(
+		prList,
+		( body ) => body.includes( '* [x] WooCommerce Core' ),
+		excludeFromTestingInstructionsIds,
+	);
+	const corePrIds = corePrs.map( ( pr ) => pr.number );
+	const featurePluginPrs = getPrsMatchingText(
+		prList,
+		( body ) => body.includes( '* [x] Feature plugin' ),
+		[...excludeFromTestingInstructionsIds, corePrIds, ...experimentalPrIds ],
+	);
+
+	const getChangelogEntry = (0,_changelog__WEBPACK_IMPORTED_MODULE_0__.getEntry)( config );
+	const changelogWithPrIds = Object.fromEntries(
+		[ ...corePrs, ...featurePluginPrs ].map(
+			( pr ) => ( [ pr.number, getChangelogEntry( pr ) ] )
+		)
+	);
+
+	const prTestingInstructionsMapFunc = ( pr ) => extractTestingInstructions( pr, changelogWithPrIds );
+	const coreTestingInstructions = corePrs.map( prTestingInstructionsMapFunc ).join( '' );
+	const featurePluginTestingInstructions = featurePluginPrs.map( prTestingInstructionsMapFunc ).join( '' );
+	const formattedCoreTestingInstructions = corePrs.length > 0 ?  `\n## Feature Plugin and package inclusion in WooCommerce
+
+${ coreTestingInstructions }` : '';
+
+	const formattedFeaturePluginTestingInstructions = featurePluginPrs.length > 0 ?  `## Feature Plugin
+
+${ featurePluginTestingInstructions }` : '';
+
+
+	return `## Testing notes and ZIP for release ${ milestoneTitle }
+
+Zip file for testing: [insert link to built zip here]
+${ formattedCoreTestingInstructions }
+${ formattedFeaturePluginTestingInstructions }
+`;
+};
+
+/**
+ * Gets the testing instructions section of a PR.
+ * @param pr {PullRequest} The PR to get the instructions from.
+ * @param changelog {object} Object keyed by PR ID and whose values are the changelog entries with links to the PR.
+ * @return {string}
+ */
+const extractTestingInstructions = ( pr, changelog ) => {
+	const { body: prBody } = pr;
+	const prBodyWithoutComments = prBody.replace( /(<!--.*?-->)|(<!--[\S\s]+?-->)|(<!--[\S\s]*?$)/g, '' );
+	const regex = /### User Facing Testing(.*)\* \[ ] Do not include in the testing notes/mis;
+	const matches = prBodyWithoutComments.match( regex );
+	const error = `⚠️ PR [#${ pr.number }](${ pr.url }) testing instructions could not be parsed. Please check it!`
+	if ( ! matches || ! matches[ 1 ] ) {
+		debug( error );
+		return error;
+	}
+	if ( ! pr.number in changelog ) {
+		return error;
+	}
+	return `### ${ changelog[ pr.number ].substr( 2 ) }\n\n${ matches[1].trim() }\n\n`;
+}
+
+/**
+ * Gets PRs for which the filter returns true.
+ * @param prList {PullRequest[]}
+ * @param filter {( string ) => boolean} A function to run against the
+ * @param excludePrIds {number[]} A list of pr numbers to exclude.
+ * @return {PullRequest[]} Returns a list of pull requests that satisfy the filter.
+ */
+const getPrsMatchingText = ( prList, filter, excludePrIds = [] ) => {
+	return prList.filter( pr => ! excludePrIds.includes( pr.number ) && filter( pr.body ) );
+}
 
 
 /***/ }),
@@ -35580,6 +35766,46 @@ module.exports = require("zlib");;
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => module['default'] :
+/******/ 				() => module;
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop)
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/node module decorator */
 /******/ 	(() => {
 /******/ 		__webpack_require__.nmd = (module) => {
