@@ -3236,7 +3236,7 @@ const extractTestingInstructions = ( pr, changelog ) => {
 	const prBodyWithoutComments = prBody.replace( /(<!--.*?-->)|(<!--[\S\s]+?-->)|(<!--[\S\s]*?$)/g, '' );
 	const regex = /### User Facing Testing(.*)\* \[ ] Do not include in the testing notes/mis;
 	const matches = prBodyWithoutComments.match( regex );
-	const error = `⚠️ PR [#${ pr.number }](${ pr.url }) testing instructions could not be parsed. Please check it!`
+	const error = `# ⚠️ PR [#${ pr.number }](${ pr.url }) testing instructions could not be parsed. Please check it!\n\n`
 	if ( ! matches || ! matches[ 1 ] ) {
 		debug( error );
 		return error;
