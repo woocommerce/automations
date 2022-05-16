@@ -637,7 +637,7 @@ const branchHandler = async ( context, octokit, config ) => {
 		return;
 	}
 	// Content comes from GH API in base64 so convert it to utf-8 string.
-	const testingInstructionsIndexBuffer = new Buffer.from( readmeResponse.data.content, 'base64' );
+	const testingInstructionsIndexBuffer = new Buffer.from( testingInstructionsIndexResponse.data.content, 'base64' );
 	const testingInstructionsIndexContents = testingInstructionsIndexBuffer.toString( 'utf-8' );
 
 	// Need to convert back to base64 to write to the repo.
