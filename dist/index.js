@@ -595,6 +595,7 @@ const branchHandler = async ( context, octokit, config ) => {
 		return;
 	}
 
+	debug( JSON.stringify( context ) );
 	const readmeResponse = await octokit.repos.getContent({
 		...context.repo,
 		path: 'readme.txt',
