@@ -640,15 +640,18 @@ const branchHandler = async ( context, octokit, config ) => {
 	const testingInstructionsIndexBuffer = new Buffer.from( testingInstructionsIndexResponse.data.content, 'base64' );
 	const testingInstructionsIndexContents = testingInstructionsIndexBuffer.toString( 'utf-8' );
 
-	// Need to convert back to base64 to write to the repo.
+	// The last line of the file is not the last entry, it is the FEEDBACK section, so we need to insert the link to the
+	// new file before that.
 	const updatedTestingInstructions = testingInstructionsIndexContents.replace(
 		'\n<!-- FEEDBACK -->',
 		`-\t[${ releaseVersion }](./${ releaseVersion.replace( /\./g, '') }.md)\n\n<!-- FEEDBACK -->`
 	);
 
+	// Create a buffer so we can convert it to base64 in the next step.
 	const updatedTestingInstructionsIndexBuffer = new Buffer.from( updatedTestingInstructions, 'utf-8' );
 	const updatedTestingInstructionsContent = updatedTestingInstructionsIndexBuffer.toString( 'base64' );
 
+	// We need this sha to commit the updated content back to the repository.
 	const testingInstructionsReadmeSha = testingInstructionsIndexResponse.data.sha;
 	const updatedTestingInstructionsIndexCommit = await octokit.repos.createOrUpdateFileContents({
 		...context.repo,
@@ -665,9 +668,9 @@ const branchHandler = async ( context, octokit, config ) => {
 	}
 
 	const testingInstructions = new Buffer.from( await getTestingInstructions( context, octokit, releaseVersion, config ), 'utf-8' );
-	debug( testingInstructions.toString() );
-	debug( testingInstructions.toString( 'base64') );
 	const releaseTestingInstructionsFilename = releaseVersion.replace(/\./g, '' );
+
+	// No need for a sha here since it's a new file.
 	const newTestingInstructionsCommit = await octokit.repos.createOrUpdateFileContents({
 		...context.repo,
 		message: `Add testing instructions for release ${ releaseVersion }`,
@@ -675,6 +678,7 @@ const branchHandler = async ( context, octokit, config ) => {
 		content: testingInstructions.toString( 'base64' ),
 		branch: context.payload.ref,
 	});
+
 	if ( ! newTestingInstructionsCommit ) {
 		debug( `releaseAutomation: Automatic creation of testing instructions failed.` );
 		return;
@@ -3169,6 +3173,9 @@ const debug = __webpack_require__( 5800 );
  */
 const getTestingInstructions = async ( context, octokit, milestoneTitle, config ) => {
 	const prList = await fetchAllPullRequests( context, octokit, milestoneTitle);
+
+	// We need to keep track of all PR ids so we can check which ones slated for this release have been accounted for
+	// in the testing instructions.
 	const allPrIds = prList.map( ( pr ) => pr.number );
 
 	const doNotIncludeInTestingInstructionsPrs = getPrsMatchingText(
@@ -3190,15 +3197,26 @@ const getTestingInstructions = async ( context, octokit, milestoneTitle, config 
 		excludeFromTestingInstructionsPrIds,
 	);
 	const corePrIds = corePrs.map( ( pr ) => pr.number );
+
+	// Here, we're only including PRs that are marked as Feature Plugin and nothing else, this is to handle the case
+	// where an IC might inadvertently mark a PR as both WooCommerce core and Feature plugin.
 	const featurePluginPrs = getPrsMatchingText(
 		prList,
 		( body ) => body.includes( '* [x] Feature plugin' ),
 		[...excludeFromTestingInstructionsPrIds, ...corePrIds, ...experimentalPrIds ],
 	);
 	const featurePluginPrIds = featurePluginPrs.map( ( pr ) => pr.number );
+
+	// Now we check the IDs of all PRs that have been categorised, and make sure none have been missed. We check against
+	// allPrIds. If some have been missed, an error gets included in the testing instructions and the release lead
+	// can check manually.
 	const allAssignedPrIds = [ ...corePrIds, ...featurePluginPrIds, ...experimentalPrIds, ...excludeFromTestingInstructionsPrIds ];
 	const htmlUrl = context.payload.repository.html_url;
-	const prsWithNoTestingCategory = allPrIds.filter( ( id ) => ! allAssignedPrIds.includes( id ) ).map( ( id ) => `[#${ id }](${ htmlUrl }/pull/${ id })` );
+	const prsWithNoTestingCategory = allPrIds.filter(
+		( id ) => ! allAssignedPrIds.includes( id ) )
+		.map(
+			( id ) => `[#${ id }](${ htmlUrl }/pull/${ id })`
+		);
 	const unaccountedForPrMessage = prsWithNoTestingCategory.length > 0 ? `### ⚠️ Warning - PRs ${ prsWithNoTestingCategory.join(', ') } do not have any testing category assigned. Please check the PR body to verify it should/should not be included in the testing instructions.` : '';
 	const getChangelogEntry = (0,_changelog__WEBPACK_IMPORTED_MODULE_0__.getEntry)( config );
 	const changelogWithPrIds = Object.fromEntries(
@@ -3235,7 +3253,12 @@ ${ formattedCoreTestingInstructions }${ formattedFeaturePluginTestingInstruction
  */
 const extractTestingInstructions = ( pr, changelog, htmlUrl ) => {
 	const { body: prBody } = pr;
+
+	// Remove all comments from the PR body so they don't get in the way.
 	const prBodyWithoutComments = prBody.replace( /(<!--.*?-->)|(<!--[\S\s]+?-->)|(<!--[\S\s]*?$)/g, '' );
+
+	// If this section isn't in the PR, then we'll error out and show that in the testing instructions instead. Release
+	// lead will need to manually check in this case.
 	const regex = /### User Facing Testing(.*)\* \[ ] Do not include in the testing notes/mis;
 	const matches = prBodyWithoutComments.match( regex );
 	const error = `### ⚠️ PR [#${ pr.number }'s](${ htmlUrl }/pull/${ pr.number }) testing instructions could not be parsed. Please check it!\n\n`
