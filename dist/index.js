@@ -649,6 +649,7 @@ const branchHandler = async ( context, octokit, config ) => {
 	const updatedTestingInstructionsIndexBuffer = new Buffer.from( updatedTestingInstructions, 'utf-8' );
 	const updatedTestingInstructionsContent = updatedTestingInstructionsIndexBuffer.toString( 'base64' );
 
+	debug( JSON.stringify( updatedReadmeCommit ) );
 	const updatedReadmeCommitSha = updatedReadmeCommit.data.sha;
 	const updatedTestingInstructionsIndexCommit = await octokit.repos.createOrUpdateFileContents({
 		...context.repo,
