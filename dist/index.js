@@ -447,6 +447,17 @@ const {
  */
 
 /**
+ * Inserts the new changelog entry into the readme file contents
+ * @param {string} contents The contents of the readme.txt file
+ * @param {string} changelog The changelog to insert into the readme.txt file
+ * @param {string} releaseVersion The version being released.
+ * @return {string} The new content of the readme.txt file containing the new changelog.
+ */
+const insertNewChangelogEntry = ( contents, changelog, releaseVersion ) => {
+	const regex = /== Changelog ==\n/;
+	return contents.replace( regex, `== Changelog ==\n\n= ${ releaseVersion } - ${ new Date().toISOString().split('T')[0] } =\n\n${ changelog }`);
+}
+/**
  * @param {GitHubContext} context
  * @param {GitHub} octokit
  * @param {ReleaseConfig} config
@@ -577,6 +588,39 @@ const branchHandler = async ( context, octokit, config ) => {
 
 	if ( ! prCreated ) {
 		debug( `releaseAutomation: Creation of pull request failed.` );
+		return;
+	}
+
+	const readmeResponse = await octokit.repos.getContent({
+		...context.repo,
+		path: 'readme.txt',
+	});
+
+	if ( ! readmeResponse ) {
+		debug( `releaseAutomation: Could not read readme.txt file from repository.` );
+		return;
+	}
+
+	// Content comes from GH API in base64 so convert it to utf-8 string.
+	const readmeBuffer = new Buffer.from( readmeResponse.data.content, 'base64' );
+	const readmeContents = readmeBuffer.toString( 'utf-8' );
+
+	// Need to convert back to base64 to write to the repo.
+	const updatedReadmeContentBuffer = new Buffer.from( insertNewChangelogEntry( readmeContents, changelog, releaseVersion ), 'utf-8' );
+	const updatedReadmeContent = updatedReadmeContentBuffer.toString( 'base64' );
+
+	const readmeSha = readmeResponse.data.sha;
+	const updatedReadmeCommit = await octokit.repos.createOrUpdateFileContents({
+		...context.repo,
+		message: 'Update changelog in readme.txt',
+		path: 'readme.txt',
+		content: updatedReadmeContent,
+		sha: readmeSha,
+		branch: context.payload.ref,
+	});
+
+	if ( ! updatedReadmeCommit ) {
+		debug( `releaseAutomation: Automatic update of readme failed.` );
 		return;
 	}
 
