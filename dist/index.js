@@ -661,7 +661,7 @@ const branchHandler = async ( context, octokit, config ) => {
 	// If it's NOT the first patch release then we need to add the line under x.x.x
 	if ( isPatchRelease( releaseVersion ) && releaseVersion.charAt( releaseVersion.length - 1 ) !== '1' ) {
 		const lastReleaseMinorVersion = parseInt( releaseVersion.charAt( releaseVersion.length - 1 ) );
-		const lastReleaseVersion = `${ releaseVersion.substr( 0, releaseVersion.length - 1 ) }${ lastReleaseMinorVersion }`;
+		const lastReleaseVersion = `${ releaseVersion.substr( 0, releaseVersion.length - 1 ) }${ lastReleaseMinorVersion - 1 }`;
 		const lastReleaseVersionLink = `    -   [${ lastReleaseVersion }](./${ lastReleaseVersion.replace( /\./g, '' ) }.md)`;
 		const newReleaseVersionLink = `    -   [${ releaseVersion }](./${ releaseVersion.replace( /\./g, '' ) }.md)`;
 		updatedTestingInstructions = testingInstructionsIndexContents.replace(
