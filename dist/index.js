@@ -649,7 +649,7 @@ const branchHandler = async ( context, octokit, config ) => {
 	const updatedTestingInstructionsIndexBuffer = new Buffer.from( updatedTestingInstructions, 'utf-8' );
 	const updatedTestingInstructionsContent = updatedTestingInstructionsIndexBuffer.toString( 'base64' );
 
-	const updatedReadmeCommitSha = updatedReadmeCommit.data.commit.tree.sha;
+	const testingInstructionsReadmeSha = testingInstructionsIndexResponse.data.sha;
 	const updatedTestingInstructionsIndexCommit = await octokit.repos.createOrUpdateFileContents({
 		...context.repo,
 		message: 'Update testing instructions in docs/testing/releases/README.md',
