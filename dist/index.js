@@ -650,25 +650,23 @@ const branchHandler = async ( context, octokit, config ) => {
 	// If it's the first patch release then we need to add the line under x.x.0
 	if ( isPatchRelease( releaseVersion ) && releaseVersion.charAt( releaseVersion.length - 1 ) === '1' ) {
 		const lastReleaseVersion = `${ releaseVersion.substr( 0, releaseVersion.length - 1 ) }0`;
-		const lastReleaseVersionLink = `-    [${ lastReleaseVersion }](./${ lastReleaseVersion.replace( /\./, '' ) }.md)`;
-		const newReleaseVersionLink = `    -   [${ releaseVersion }](./${ releaseVersion.replace( /\./, '' ) }.md)`;
+		const lastReleaseVersionLink = `-    [${ lastReleaseVersion }](./${ lastReleaseVersion.replace( /\./g, '' ) }.md)`;
+		const newReleaseVersionLink = `    -   [${ releaseVersion }](./${ releaseVersion.replace( /\./g, '' ) }.md)`;
 		updatedTestingInstructions = testingInstructionsIndexContents.replace(
 			lastReleaseVersionLink,
 			`${ lastReleaseVersionLink }\n${ newReleaseVersionLink }`
 		);
-		debug( JSON.stringify({lastReleaseVersionLink, lastReleaseVersion, newReleaseVersionLink}) );
 	}
 	// If it's NOT the first patch release then we need to add the line under x.x.x
 	if ( isPatchRelease( releaseVersion ) && releaseVersion.charAt( releaseVersion.length - 1 ) !== '1' ) {
 		const lastReleaseMinorVersion = parseInt( releaseVersion.charAt( releaseVersion.length - 1 ) );
 		const lastReleaseVersion = `${ releaseVersion.substr( 0, releaseVersion.length - 1 ) }${ lastReleaseMinorVersion }`;
-		const lastReleaseVersionLink = `    -   [${ lastReleaseVersion }](./${ lastReleaseVersion.replace( /\./, '' ) }.md)`;
-		const newReleaseVersionLink = `    -   [${ releaseVersion }](./${ releaseVersion.replace( /\./, '' ) }.md)`;
+		const lastReleaseVersionLink = `    -   [${ lastReleaseVersion }](./${ lastReleaseVersion.replace( /\./g, '' ) }.md)`;
+		const newReleaseVersionLink = `    -   [${ releaseVersion }](./${ releaseVersion.replace( /\./g, '' ) }.md)`;
 		updatedTestingInstructions = testingInstructionsIndexContents.replace(
 			lastReleaseVersionLink,
 			`${ lastReleaseVersionLink }\n${ newReleaseVersionLink }`
 		);
-		debug( JSON.stringify({lastReleaseVersionLink, lastReleaseVersion, newReleaseVersionLink}) );
 	}
 
 	// Create a buffer so we can convert it to base64 in the next step.
