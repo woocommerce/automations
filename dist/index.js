@@ -3198,7 +3198,7 @@ const getTestingInstructions = async ( context, octokit, milestoneTitle, config 
 	const featurePluginPrIds = featurePluginPrs.map( ( pr ) => pr.number );
 	const allAssignedPrIds = [ ...corePrIds, ...featurePluginPrIds, experimentalPrIds, excludeFromTestingInstructionsPrIds ];
 	const prsWithNoTestingCategory = allPrIds.filter( ( id ) => ! [ ...corePrIds, ...experimentalPrIds, ...featurePluginPrIds ].includes( id ) );
-	const unaccountedForPrMessage = prsWithNoTestingCategory.length > 0 ? `# ⚠️ Warning - PRs could not be categorised!\n\nPRs #${ prsWithNoTestingCategory.join(', #') } do not have any testing category assigned. Please check the PR body to verify it should/should not be included in the testing instructions.` : '';
+	const unaccountedForPrMessage = prsWithNoTestingCategory.length > 0 ? `### ⚠️ Warning - PRs #${ prsWithNoTestingCategory.join(' , #') } do not have any testing category assigned. Please check the PR body to verify it should/should not be included in the testing instructions.` : '';
 	const getChangelogEntry = (0,_changelog__WEBPACK_IMPORTED_MODULE_0__.getEntry)( config );
 	const changelogWithPrIds = Object.fromEntries(
 		[ ...corePrs, ...featurePluginPrs ].map(
@@ -3236,7 +3236,7 @@ const extractTestingInstructions = ( pr, changelog ) => {
 	const prBodyWithoutComments = prBody.replace( /(<!--.*?-->)|(<!--[\S\s]+?-->)|(<!--[\S\s]*?$)/g, '' );
 	const regex = /### User Facing Testing(.*)\* \[ ] Do not include in the testing notes/mis;
 	const matches = prBodyWithoutComments.match( regex );
-	const error = `# ⚠️ PR [#${ pr.number }](${ pr.url }) testing instructions could not be parsed. Please check it!\n\n`
+	const error = `### ⚠️ PR [#${ pr.number }](${ pr.url }) testing instructions could not be parsed. Please check it!\n\n`
 	if ( ! matches || ! matches[ 1 ] ) {
 		debug( error );
 		return error;
