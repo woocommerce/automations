@@ -656,6 +656,7 @@ const branchHandler = async ( context, octokit, config ) => {
 			lastReleaseVersionLink,
 			`${ lastReleaseVersionLink }\n${ newReleaseVersionLink }`
 		);
+		debug( JSON.stringify({lastReleaseVersionLink, lastReleaseVersion, newReleaseVersionLink}) );
 	}
 	// If it's NOT the first patch release then we need to add the line under x.x.x
 	if ( isPatchRelease( releaseVersion ) && releaseVersion.charAt( releaseVersion.length - 1 ) !== '1' ) {
@@ -667,6 +668,7 @@ const branchHandler = async ( context, octokit, config ) => {
 			lastReleaseVersionLink,
 			`${ lastReleaseVersionLink }\n${ newReleaseVersionLink }`
 		);
+		debug( JSON.stringify({lastReleaseVersionLink, lastReleaseVersion, newReleaseVersionLink}) );
 	}
 
 	// Create a buffer so we can convert it to base64 in the next step.
