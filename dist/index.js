@@ -670,6 +670,7 @@ const branchHandler = async ( context, octokit, config ) => {
 			`-\s*\[${ lastReleaseVersion }\]\(\./${ lastReleaseVersion.replace( /\./g, '' ) }.md\)`
 		);
 		const newReleaseVersionLink = `    -   [${ releaseVersion }](./${ releaseVersion.replace( /\./g, '' ) }.md)`;
+		debug( JSON.stringify( lastReleaseVersionRegex ) );
 		updatedTestingInstructions = testingInstructionsIndexContents.replace(
 			lastReleaseVersionRegex,
 			`${ lastReleaseVersionLink }\n${ newReleaseVersionLink }`
