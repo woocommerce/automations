@@ -652,7 +652,7 @@ const branchHandler = async ( context, octokit, config ) => {
 		const lastReleaseVersion = `${ releaseVersion.substr( 0, releaseVersion.length - 1 ) }0`;
 		const lastReleaseVersionLink = `-   [${ lastReleaseVersion }](./${ lastReleaseVersion.replace( /\./g, '' ) }.md)`;
 		const lastReleaseVersionRegex = new RegExp(
-			`-\s*\[${ lastReleaseVersion }\]\(\.\/${ lastReleaseVersion.replace( /\./g, '' ) }.md\)`
+			`-\\s*\\[${ lastReleaseVersion.replace( /\./g, '\\.') }\\]\\(\\.\\/${ lastReleaseVersion.replace( /\./g, '' ) }\\.md\\)`
 		);
 		debug( lastReleaseVersionRegex );
 
@@ -669,7 +669,7 @@ const branchHandler = async ( context, octokit, config ) => {
 		const lastReleaseVersion = `${ releaseVersion.substr( 0, releaseVersion.length - 1 ) }${ lastReleaseMinorVersion - 1 }`;
 		const lastReleaseVersionLink = `    -   [${ lastReleaseVersion }](./${ lastReleaseVersion.replace( /\./g, '' ) }.md)`;
 		const lastReleaseVersionRegex = new RegExp(
-			`-\s*\[${ lastReleaseVersion }\]\(\.\/${ lastReleaseVersion.replace( /\./g, '' ) }.md\)`
+			`-\\s*\\[${ lastReleaseVersion.replace( /\./g, '\\.') }\\]\\(\\.\\/${ lastReleaseVersion.replace( /\./g, '' ) }\\.md\\)`
 		);
 		const newReleaseVersionLink = `    -   [${ releaseVersion }](./${ releaseVersion.replace( /\./g, '' ) }.md)`;
 		updatedTestingInstructions = testingInstructionsIndexContents.replace(
