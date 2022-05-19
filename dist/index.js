@@ -666,21 +666,6 @@ const branchHandler = async ( context, octokit, config ) => {
 		);
 	}
 
-	// If it's NOT the first patch release then we need to add the line under x.x.x
-	if ( isPatchRelease( releaseVersion ) && releaseVersion.charAt( releaseVersion.length - 1 ) !== '1' ) {
-		const lastReleaseMinorVersion = parseInt( releaseVersion.charAt( releaseVersion.length - 1 ) );
-		const lastReleaseVersion = `${ releaseVersion.substr( 0, releaseVersion.length - 1 ) }${ lastReleaseMinorVersion - 1 }`;
-		const lastReleaseVersionLink = `    -   [${ lastReleaseVersion }](./${ lastReleaseVersion.replace( /\./g, '' ) }.md)`;
-		const lastReleaseVersionRegex = new RegExp(
-			`-\\s*\\[${ lastReleaseVersion.replace( /\./g, '\\.') }\\]\\(\\.\\/${ lastReleaseVersion.replace( /\./g, '' ) }\\.md\\)`
-		);
-		const newReleaseVersionLink = `    -   [${ releaseVersion }](./${ releaseVersion.replace( /\./g, '' ) }.md)`;
-		updatedTestingInstructions = testingInstructionsIndexContents.replace(
-			lastReleaseVersionRegex,
-			`${ lastReleaseVersionLink }\n${ newReleaseVersionLink }`
-		);
-	}
-
 	// Create a buffer so we can convert it to base64 in the next step.
 	const updatedTestingInstructionsIndexBuffer = new Buffer.from( updatedTestingInstructions, 'utf-8' );
 	const updatedTestingInstructionsContent = updatedTestingInstructionsIndexBuffer.toString( 'base64' );
