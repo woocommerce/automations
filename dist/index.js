@@ -471,6 +471,34 @@ const updateMinRequiredVersionsReadme = ( contents, latestWPVersion ) => {
 		.replace( regexTestedUpTo, `Tested up to: ${ version }` );
 };
 
+const updateMinRequiredVersionsWooBlockPHP = (
+	contents,
+	latestWPVersion,
+	latestWCVersion
+) => {
+	const wpVersionList = latestWPVersion.split( '.' );
+	const wpVersion = `${ wpVersionList[ 0 ] }.${ wpVersionList[ 1 ] }`;
+	const wcVersionList = latestWCVersion.split( '.' );
+	const wcVersion = `${ wcVersionList[ 0 ] }.${ wcVersionList[ 1 ] }`;
+	const previousWCVersion =
+		wcVersionList[ 1 ] === '0'
+			? `${ +wcVersionList[ 0 ] - 1 }.9`
+			: `${ wcVersionList[ 0 ] }.${ +wcVersionList[ 1 ] - 1 }`;
+	const regexRequiresAtLeast = /\* Requires at least:.*/;
+	const regexWCRequiresAtLeast = /\* WC requires at least:.*/;
+	const regexWCTestedUpTo = /\* WC tested up to:.*/;
+	return contents
+		.replace( regexRequiresAtLeast, `* Requires at least: ${ wpVersion }` )
+		.replace(
+			regexWCRequiresAtLeast,
+			`* WC requires at least: ${ wcVersion }`
+		)
+		.replace(
+			regexWCTestedUpTo,
+			`* WC tested up to: ${ previousWCVersion }`
+		);
+};
+
 /**
  * @param {GitHubContext} context
  * @param {GitHub} octokit
@@ -622,6 +650,7 @@ const branchHandler = async ( context, octokit, config ) => {
 			repo: 'WordPress',
 		}
 	);
+	const wpLatestReleaseVersion = wpTags.data[ 0 ].name;
 
 	// Content comes from GH API in base64 so convert it to utf-8 string.
 	const readmeBuffer = new Buffer.from( readmeResponse.data.content, 'base64' );
@@ -635,7 +664,7 @@ const branchHandler = async ( context, octokit, config ) => {
 
 	const updatedReadmeMinRequiredVersion = updateMinRequiredVersionsReadme(
 		updatedReadmeChangeLog,
-		wpTags.data[ 0 ].name
+		wpLatestReleaseVersion
 	);
 
 	// Need to convert back to base64 to write to the repo.
@@ -660,57 +689,68 @@ const branchHandler = async ( context, octokit, config ) => {
 		return;
 	}
 
-	// const wooBlockPHPResponse = await octokit.repos.getContent( {
-	// 	...context.repo,
-	// 	path: 'woocommerce-gutenberg-products-block.php',
-	// } );
+	// Get WooCommerce data
+	const wcLatestRelease = await octokit.request(
+		'GET /repos/woocommerce/woocommerce/releases/latest',
+		{
+			owner: 'woocommerce',
+			repo: 'woocommerce',
+		}
+	);
 
-	// if ( ! wooBlockPHPResponse ) {
-	// 	debug(
-	// 		`releaseAutomation: Could not read woocommerce-gutenberg-products-block.php file from repository.`
-	// 	);
-	// 	return;
-	// }
+	const wcLatestReleaseVersion = wcLatestRelease.data.name;
 
-	// // Content comes from GH API in base64 so convert it to utf-8 string.
-	// const wooBlockPHPBuffer = new Buffer.from(
-	// 	wooBlockPHPResponse.data.content,
-	// 	'base64'
-	// );
-	// const wooBlockPHPContents = wooBlockPHPBuffer.toString( 'utf-8' );
+	const wooBlockPHPResponse = await octokit.repos.getContent( {
+		...context.repo,
+		path: 'woocommerce-gutenberg-products-block.php',
+	} );
 
-	// // Need to convert back to base64 to write to the repo.
-	// const updatedWooBlockPHPContentBuffer = new Buffer.from(
-	// 	insertNewChangelogEntry(
-	// 		wooBlockPHPContents,
-	// 		changelog,
-	// 		releaseVersion
-	// 	),
-	// 	'utf-8'
-	// );
-	// const updatedWooBlockPHPContent = updatedWooBlockPHPContentBuffer.toString(
-	// 	'base64'
-	// );
+	if ( ! wooBlockPHPResponse ) {
+		debug(
+			`releaseAutomation: Could not read woocommerce-gutenberg-products-block.php file from repository.`
+		);
+		return;
+	}
 
-	// const wooBlockPHPSha = wooBlockPHPResponse.data.sha;
-	// const updatedWooBlockPHPCommit = await octokit.repos.createOrUpdateFileContents(
-	// 	{
-	// 		...context.repo,
-	// 		message:
-	// 			'Update minimum required wc & wp versions in woocommerce-gutenberg-products-block.php',
-	// 		path: 'woocommerce-gutenberg-products-block.php',
-	// 		content: updatedWooBlockPHPContent,
-	// 		sha: wooBlockPHPSha,
-	// 		branch: context.payload.ref,
-	// 	}
-	// );
+	// Content comes from GH API in base64 so convert it to utf-8 string.
+	const wooBlockPHPBuffer = new Buffer.from(
+		wooBlockPHPResponse.data.content,
+		'base64'
+	);
+	const wooBlockPHPContents = wooBlockPHPBuffer.toString( 'utf-8' );
 
-	// if ( ! updatedWooBlockPHPCommit ) {
-	// 	debug(
-	// 		`releaseAutomation: Automatic update of woocommerce-gutenberg-products-block.php failed.`
-	// 	);
-	// 	return;
-	// }
+	// Need to convert back to base64 to write to the repo.
+	const updatedWooBlockPHPContentBuffer = new Buffer.from(
+		updateMinRequiredVersionsWooBlockPHP(
+			wooBlockPHPContents,
+			wpLatestReleaseVersion,
+			wcLatestReleaseVersion
+		),
+		'utf-8'
+	);
+	const updatedWooBlockPHPContent = updatedWooBlockPHPContentBuffer.toString(
+		'base64'
+	);
+
+	const wooBlockPHPSha = wooBlockPHPResponse.data.sha;
+	const updatedWooBlockPHPCommit = await octokit.repos.createOrUpdateFileContents(
+		{
+			...context.repo,
+			message:
+				'Update minimum required wc & wp versions in woocommerce-gutenberg-products-block.php',
+			path: 'woocommerce-gutenberg-products-block.php',
+			content: updatedWooBlockPHPContent,
+			sha: wooBlockPHPSha,
+			branch: context.payload.ref,
+		}
+	);
+
+	if ( ! updatedWooBlockPHPCommit ) {
+		debug(
+			`releaseAutomation: Automatic update of woocommerce-gutenberg-products-block.php failed.`
+		);
+		return;
+	}
 
 	// Add initial Action checklist as comment.
 	const commentBody = lineBreak(
