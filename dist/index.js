@@ -629,8 +629,7 @@ const branchHandler = async ( context, octokit, config ) => {
 
 	const updatedReadmeChangeLog = insertNewChangelogEntry(
 		readmeContents,
-		// changelog,
-		'## My Change log!!',
+		changelog,
 		releaseVersion
 	);
 
