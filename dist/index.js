@@ -651,11 +651,11 @@ const branchHandler = async ( context, octokit, config ) => {
 	if ( isPatchRelease( releaseVersion ) && releaseVersion.charAt( releaseVersion.length - 1 ) === '1' ) {
 		const lastReleaseVersion = `${ releaseVersion.substr( 0, releaseVersion.length - 1 ) }0`;
 		const lastReleaseVersionLink = `-   [${ lastReleaseVersion }](./${ lastReleaseVersion.replace( /\./g, '' ) }.md)`;
-		debug( JSON.stringify( lastReleaseVersionRegex ) );
-
 		const lastReleaseVersionRegex = new RegExp(
 			`-\s*\[${ lastReleaseVersion }\]\(\./${ lastReleaseVersion.replace( /\./g, '' ) }.md\)`
 		);
+		debug( JSON.stringify( lastReleaseVersionRegex ) );
+
 		const newReleaseVersionLink = `    -   [${ releaseVersion }](./${ releaseVersion.replace( /\./g, '' ) }.md)`;
 		updatedTestingInstructions = testingInstructionsIndexContents.replace(
 			lastReleaseVersionRegex,
