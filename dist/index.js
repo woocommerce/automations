@@ -461,6 +461,13 @@ const insertNewChangelogEntry = ( contents, changelog, releaseVersion ) => {
 	);
 }
 
+/**
+ * Inserts the new changelog entry into the readme file contents
+ *
+ * @param {string} contents The contents of the readme.txt file
+ * @param {string} latestWPVersion The latest version of WordPress.
+ * @return {string} The new content of the readme.txt file containing the updated WP version.
+ */
 const updateMinRequiredVersionsReadme = ( contents, latestWPVersion ) => {
 	const versionList = latestWPVersion.split( '.' );
 	const version = `${ versionList[ 0 ] }.${ versionList[ 1 ] }`;
@@ -471,6 +478,14 @@ const updateMinRequiredVersionsReadme = ( contents, latestWPVersion ) => {
 		.replace( regexTestedUpTo, `Tested up to: ${ version }` );
 };
 
+/**
+ * Inserts the new changelog entry into the readme file contents
+ *
+ * @param {string} contents The contents of the "Woo Block PHP" file
+ * @param {string} latestWPVersion The latest version of WordPress.
+ * @param {string} latestWCVersion The latest version of WooCommerce.
+ * @return {string} The new content of the file containing the updated WP & WC versions.
+ */
 const updateMinRequiredVersionsWooBlockPHP = (
 	contents,
 	latestWPVersion,
@@ -491,12 +506,9 @@ const updateMinRequiredVersionsWooBlockPHP = (
 		.replace( regexRequiresAtLeast, `* Requires at least: ${ wpVersion }` )
 		.replace(
 			regexWCRequiresAtLeast,
-			`* WC requires at least: ${ wcVersion }`
+			`* WC requires at least: ${ previousWCVersion }`
 		)
-		.replace(
-			regexWCTestedUpTo,
-			`* WC tested up to: ${ previousWCVersion }`
-		);
+		.replace( regexWCTestedUpTo, `* WC tested up to: ${ wcVersion }` );
 };
 
 /**
