@@ -670,8 +670,8 @@ const branchHandler = async ( context, octokit, config ) => {
 		else {
 			const newReleaseVersionLink = `-   [${releaseVersion}](./${releaseVersion.replace(/\./g, '')}.md)`;
 			updatedTestingInstructions = testingInstructionsIndexContents.replace(
-				/\w*<!-- FEEDBACK -->/,
-				`${newReleaseVersionLink}\n<!-- FEEDBACK -->`
+				/\n\n<!-- FEEDBACK -->/,
+				`${ newReleaseVersionLink }\n<!-- FEEDBACK -->`
 			);
 		}
 	}
