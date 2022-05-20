@@ -649,9 +649,9 @@ const branchHandler = async ( context, octokit, config ) => {
 
 	// If it's the first patch release then we need to add the line under x.x.0 if it's not then add it under x.x.x (last release)
 	if ( isPatchRelease( releaseVersion ) ) {
-		const isFirstPatch = releaseVersion.charAt( releaseVersion.length - 1 ) === '1';
-		let lastReleasePatchVersion = '0';
 		const [ currentReleaseMajorVersion, currentReleaseMinorVersion, currentReleasePatchVersion ] = releaseVersion.split( '.' );
+		const isFirstPatch = currentReleasePatchVersion === '1';
+		let lastReleasePatchVersion = '0';
 		if ( ! isFirstPatch ) {
 			lastReleasePatchVersion = parseInt( currentReleasePatchVersion ) - 1;
 		}
@@ -3249,7 +3249,7 @@ const getTestingInstructions = async ( context, octokit, milestoneTitle, config 
 	const unaccountedForPrMessage = prsWithNoTestingCategory.length > 0 ? `### ⚠️ Warning - PRs ${ prsWithNoTestingCategory.join(', ') } do not have any testing category assigned. Please check the PR body to verify it should/should not be included in the testing instructions.` : '';
 	const getChangelogEntry = (0,_changelog__WEBPACK_IMPORTED_MODULE_0__.getEntry)( config );
 	const changelogWithPrIds = Object.fromEntries(
-		[ ...corePrs, ...featurePluginPrs ].map(
+		[ ...corePrs, ...featurePluginPrs, ...experimentalPrIds ].map(
 			( pr ) => ( [ pr.number, getChangelogEntry( pr ) ] )
 		)
 	);
