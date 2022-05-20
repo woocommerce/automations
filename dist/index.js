@@ -529,10 +529,15 @@ const updateMinWPVersionPHPCS = ( contents, latestWPVersion ) => {
 	const wpVersionList = latestWPVersion.split( '.' );
 	const wpVersion = `${ wpVersionList[ 0 ] }.${ wpVersionList[ 1 ] }`;
 	const regexRequiresAtLeast = /<.*minimum_supported_wp_version.*>/;
-	return contents.replace(
+
+	const result = contents.replace(
 		regexRequiresAtLeast,
 		`<config name="minimum_supported_wp_version" value="${ wpVersion }" />`
 	);
+
+	debug( `result: ${ result }` );
+
+	return result;
 };
 
 /**
