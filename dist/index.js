@@ -429,6 +429,7 @@ const { lineBreak } = __webpack_require__( 1606 );
 const debug = __webpack_require__( 5800 );
 const {
 	getReleaseVersion,
+	getWPAndWCReleaseVersions,
 	isPatchRelease,
 	getReleaseBranch,
 	duplicateChecker,
@@ -563,8 +564,9 @@ const updateFile = async ( context, octokit, path, message, updateContent ) => {
 
 	if ( ! updatedCommit ) {
 		debug( `releaseAutomation: Automatic update of ${ path } failed.` );
-		return;
 	}
+
+	return updatedCommit;
 };
 
 /**
@@ -701,14 +703,10 @@ const branchHandler = async ( context, octokit, config ) => {
 		return;
 	}
 
-	const wpTags = await octokit.request(
-		'GET /repos/WordPress/WordPress/tags',
-		{
-			owner: 'WordPress',
-			repo: 'WordPress',
-		}
-	);
-	const wpLatestReleaseVersion = wpTags.data[ 0 ].name;
+	const {
+		wpLatestReleaseVersion,
+		wcLatestReleaseVersion,
+	} = getWPAndWCReleaseVersions( octokit );
 
 	const readmePath = 'readme.txt';
 	const readmeUpdateFileMessage = `Update changelog in ${ readmePath }`;
@@ -726,7 +724,7 @@ const branchHandler = async ( context, octokit, config ) => {
 		);
 	};
 
-	updateFile(
+	const updatedReadmeCommit = updateFile(
 		context,
 		octokit,
 		readmePath,
@@ -734,16 +732,7 @@ const branchHandler = async ( context, octokit, config ) => {
 		updateReadmeContent
 	);
 
-	// Get WooCommerce data
-	const wcLatestRelease = await octokit.request(
-		'GET /repos/woocommerce/woocommerce/releases/latest',
-		{
-			owner: 'woocommerce',
-			repo: 'woocommerce',
-		}
-	);
-
-	const wcLatestReleaseVersion = wcLatestRelease.data.name;
+	if ( ! updatedReadmeCommit ) return;
 
 	const wooBlockPHPPath = 'woocommerce-gutenberg-products-block.php';
 	const wooBlockPHPUpdateFileMessage = `Update minimum required wc & wp versions in ${ wooBlockPHPPath }`;
@@ -755,13 +744,15 @@ const branchHandler = async ( context, octokit, config ) => {
 			wcLatestReleaseVersion
 		);
 
-	updateFile(
+	const updatedWooBlockPHPCommit = updateFile(
 		context,
 		octokit,
 		wooBlockPHPPath,
 		wooBlockPHPUpdateFileMessage,
 		updateWooBlockPHPContent
 	);
+
+	if ( ! updatedWooBlockPHPCommit ) return;
 
 	// Add initial Action checklist as comment.
 	const commentBody = lineBreak(
@@ -1341,6 +1332,45 @@ module.exports = ( payload ) => {
 
 /***/ }),
 
+/***/ 7137:
+/***/ ((module) => {
+
+/**
+ * @typedef {import('../../../typedefs').GitHub} GitHub
+ */
+
+/**
+ * @param {GitHub} octokit
+ */
+module.exports = async ( octokit ) => {
+	const wpTags = await octokit.request(
+		'GET /repos/WordPress/WordPress/tags',
+		{
+			owner: 'WordPress',
+			repo: 'WordPress',
+		}
+	);
+	const wpLatestReleaseVersion = wpTags.data[ 0 ].name;
+
+	const wcLatestRelease = await octokit.request(
+		'GET /repos/woocommerce/woocommerce/releases/latest',
+		{
+			owner: 'woocommerce',
+			repo: 'woocommerce',
+		}
+	);
+
+	const wcLatestReleaseVersion = wcLatestRelease.data.name;
+
+	return {
+		wpLatestReleaseVersion,
+		wcLatestReleaseVersion,
+	};
+};
+
+
+/***/ }),
+
 /***/ 9986:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -1388,6 +1418,7 @@ module.exports = async ( version, context, octokit, state = 'open' ) => {
 
 module.exports = {
 	getReleaseVersion: __webpack_require__( 9946 ),
+	getWPAndWCReleaseVersions: __webpack_require__( 7137 ),
 	isPatchRelease: __webpack_require__( 2363 ),
 	getReleaseBranch: __webpack_require__( 7971 ),
 	duplicateChecker: __webpack_require__( 549 ),
