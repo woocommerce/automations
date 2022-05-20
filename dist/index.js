@@ -512,7 +512,10 @@ const updateMinRequiredVersionsWooBlockPHP = (
 			`* WC requires at least: ${ previousWCVersion }`
 		)
 		.replace( regexWCTestedUpTo, `* WC tested up to: ${ wcVersion }` )
-		.replace( regexMinWPVersion, `\$minimum_wp_version = ${ wpVersion };` );
+		.replace(
+			regexMinWPVersion,
+			`\$minimum_wp_version = '${ wpVersion }';`
+		);
 };
 
 /**
@@ -670,7 +673,7 @@ const branchHandler = async ( context, octokit, config ) => {
 		);
 	};
 
-	const updatedReadmeCommit = updateFile(
+	const updatedReadmeCommit = await updateFile(
 		context,
 		octokit,
 		readmePath,
@@ -690,7 +693,7 @@ const branchHandler = async ( context, octokit, config ) => {
 			wcLatestReleaseVersion
 		);
 
-	const updatedWooBlockPHPCommit = updateFile(
+	const updatedWooBlockPHPCommit = await updateFile(
 		context,
 		octokit,
 		wooBlockPHPPath,
