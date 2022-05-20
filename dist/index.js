@@ -3286,7 +3286,7 @@ const extractTestingInstructions = ( pr, changelog, htmlUrl ) => {
 		return error;
 	}
 	debug( JSON.stringify( changelog ) );
-	if ( ! pr.number in changelog ) {
+	if ( ! changelog.hasOwnProperty( pr.number ) && changelog[ pr.number ] ) {
 		debug( `PR ${ pr.number } not found in changelog. Skipping extracting testing instructions.` );
 		return error;
 	}
