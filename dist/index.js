@@ -3287,6 +3287,7 @@ const extractTestingInstructions = ( pr, changelog, htmlUrl ) => {
 	}
 	debug( JSON.stringify( changelog ) );
 	if ( ! pr.number in changelog ) {
+		debug( `PR ${ pr.number } not found in changelog. Skipping extracting testing instructions.` );
 		return error;
 	}
 	return `### ${ changelog[ pr.number ].substr( 2 ) }\n\n${ matches[1].trim() }\n\n`;
