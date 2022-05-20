@@ -3285,6 +3285,7 @@ const extractTestingInstructions = ( pr, changelog, htmlUrl ) => {
 		debug( error );
 		return error;
 	}
+	debug( JSON.stringify( changelog ) );
 	if ( ! pr.number in changelog ) {
 		return error;
 	}
