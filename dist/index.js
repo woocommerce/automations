@@ -660,11 +660,20 @@ const branchHandler = async ( context, octokit, config ) => {
 		const lastReleaseVersionRegex = new RegExp(
 			`-\\s*\\[${ lastReleaseVersion.replace( /\./g, '\\.') }\\]\\(\\.\\/${ lastReleaseVersion.replace( /\./g, '' ) }\\.md\\)`
 		);
-		const newReleaseVersionLink = `    -   [${ releaseVersion }](./${ releaseVersion.replace( /\./g, '' ) }.md)`;
-		updatedTestingInstructions = testingInstructionsIndexContents.replace(
-			lastReleaseVersionRegex,
-			`${ lastReleaseVersionLink }\n${ newReleaseVersionLink }`
-		);
+		if ( testingInstructionsIndexContents.indexOf( lastReleaseVersionLink ) >= 0 ) {
+			const newReleaseVersionLink = `    -   [${releaseVersion}](./${releaseVersion.replace(/\./g, '')}.md)`;
+			updatedTestingInstructions = testingInstructionsIndexContents.replace(
+				lastReleaseVersionRegex,
+				`${lastReleaseVersionLink}\n${newReleaseVersionLink}`
+			);
+		}
+		else {
+			const newReleaseVersionLink = `-   [${releaseVersion}](./${releaseVersion.replace(/\./g, '')}.md)`;
+			updatedTestingInstructions = testingInstructionsIndexContents.replace(
+				/\w*<!-- FEEDBACK -->/,
+				`${newReleaseVersionLink}\n<!-- FEEDBACK -->`
+			);
+		}
 	}
 
 	// Create a buffer so we can convert it to base64 in the next step.
