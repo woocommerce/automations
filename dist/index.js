@@ -630,10 +630,10 @@ const branchHandler = async ( context, octokit, config ) => {
 
 	const testingInstructionsIndexResponse = await octokit.repos.getContent({
 		...context.repo,
-		path: 'docs/testing/releases/README.md',
+		path: 'docs/internal-developers/testing/releases/README.md',
 	});
 	if ( ! testingInstructionsIndexResponse ) {
-		debug( `releaseAutomation: Could not read docs/testing/releases/README.md file from repository.` );
+		debug( `releaseAutomation: Could not read docs/internal/developers/testing/releases/README.md file from repository.` );
 		return;
 	}
 	// Content comes from GH API in base64 so convert it to utf-8 string.
@@ -684,15 +684,15 @@ const branchHandler = async ( context, octokit, config ) => {
 	const testingInstructionsReadmeSha = testingInstructionsIndexResponse.data.sha;
 	const updatedTestingInstructionsIndexCommit = await octokit.repos.createOrUpdateFileContents({
 		...context.repo,
-		message: 'Update testing instructions in docs/testing/releases/README.md',
-		path: 'docs/testing/releases/README.md',
+		message: 'Update testing instructions in docs/internal-developers/testing/releases/README.md',
+		path: 'docs/internal-developers/testing/releases/README.md',
 		content: updatedTestingInstructionsContent,
 		sha: testingInstructionsReadmeSha,
 		branch: context.payload.ref,
 	});
 
 	if ( ! updatedTestingInstructionsIndexCommit ) {
-		debug( `releaseAutomation: Automatic update of docs/testing/releases/README.md failed.` );
+		debug( `releaseAutomation: Automatic update of docs/internal-developers/testing/releases/README.md failed.` );
 		return;
 	}
 
@@ -703,7 +703,7 @@ const branchHandler = async ( context, octokit, config ) => {
 	const newTestingInstructionsCommit = await octokit.repos.createOrUpdateFileContents({
 		...context.repo,
 		message: `Add testing instructions for release ${ releaseVersion }`,
-		path: `docs/testing/releases/${ releaseTestingInstructionsFilename }.md`,
+		path: `docs/internal-developers/testing/releases/${ releaseTestingInstructionsFilename }.md`,
 		content: testingInstructions.toString( 'base64' ),
 		branch: context.payload.ref,
 	});
