@@ -2254,7 +2254,7 @@ module.exports = {
  * External dependencies
  */
 const debug = __nccwpck_require__( 1655 );
-const { setFailed, debug: coreDebug } = __nccwpck_require__( 9590 );
+//const { setFailed, debug: coreDebug } = require( '@actions/core' );
 
 const runner = async ( context, octokit, config ) => {
 	debug( `eventName: ${ context.eventName }.` );
