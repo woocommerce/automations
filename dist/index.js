@@ -24,6 +24,7 @@ module.exports = [
 	__webpack_require__( 2994 ),
 	__webpack_require__( 7866 ),
 	__webpack_require__( 8224 ),
+	__webpack_require__( 3707 ),
 ];
 
 
@@ -2235,6 +2236,209 @@ module.exports = async ( { context, octokit, config = {}, issue }, data ) => {
 			} ),
 		] );
 	}
+};
+
+
+/***/ }),
+
+/***/ 8927:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+/**
+ * External dependencies
+ */
+const { setFailed, getInput: coreGetInput } = __webpack_require__( 2186 );
+
+const inputs = {
+	targetMilestone: {
+		input: 'target_milestone',
+		default: '',
+		required: false,
+	},
+};
+
+const getInput = ( input ) => {
+	const value = coreGetInput( input.input ) || input.default;
+	if ( input.required && ! value ) {
+		throw new Error(
+			`Update Milestone: Missing required input ${ input.input } your input: ${ input }`
+		);
+	}
+
+	return value;
+};
+
+module.exports = async () => {
+	try {
+		return {
+			targetMilestone: getInput( inputs.targetMilestone ),
+		};
+	} catch ( error ) {
+		setFailed( `Update Milestone: Target milestone: ${ error }` );
+	}
+};
+
+
+/***/ }),
+
+/***/ 3707:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const runner = __webpack_require__( 9561 );
+const getConfig = __webpack_require__( 8927 );
+
+module.exports = {
+	name: 'update-milestone',
+	events: [ 'release' ],
+	runner,
+	getConfig,
+};
+
+
+/***/ }),
+
+/***/ 9561:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+/**
+ * External dependencies
+ */
+const { setFailed } = __webpack_require__( 2186 );
+
+/**
+ * Internal dependencies
+ */
+const debug = __webpack_require__( 5800 );
+const updateMilestoneHandler = __webpack_require__( 8223 );
+
+/**
+ * @typedef {import('@actions/github').GitHub} GitHub
+ * @typedef {import('@actions/github').context} GitHubContext
+ * @typedef {import('../../typedefs').AutomationTaskRunner} AutomationTaskRunner
+ */
+
+const runnerMatrix = {
+	release: {
+		published: updateMilestoneHandler,
+	},
+};
+
+/**
+ * The task runner for this action
+ *
+ * @param {string} eventName The event we want the runner for.
+ * @param {string} [action]  The action we want the runner for.
+ *
+ * @return {AutomationTaskRunner} A runner function.
+ */
+const getRunnerTask = ( eventName, action ) => {
+	if (
+		! runnerMatrix[ eventName ] ||
+		action === undefined ||
+		! runnerMatrix[ eventName ][ action ]
+	) {
+		return;
+	}
+	return runnerMatrix[ eventName ][ action ];
+};
+
+/**
+ * The task runner for this action to update the milestone
+ *
+ * @param {GitHubContext} context Context for the job run (github).
+ * @param {GitHub}        octokit GitHub api helper.
+ * @param {Object}        config  Config object.
+ *
+ * @return {AutomationTaskRunner} task runner.
+ */
+const runner = async ( context, octokit, config ) => {
+	const task = getRunnerTask( context.eventName, context.payload.action );
+	if ( typeof task === 'function' ) {
+		debug( `Update Milestone: Executing the ${ task.name } task.` );
+		await task( context, octokit, config );
+	} else {
+		setFailed(
+			`Update Milestone: There is no configured task for the event = '${ context.eventName }' and the payload action = '${ context.payload.action }'`
+		);
+	}
+};
+
+module.exports = runner;
+
+
+/***/ }),
+
+/***/ 8223:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+/**
+ * Internal dependencies
+ */
+const debug = __webpack_require__( 5800 );
+const { getMilestoneByTitle } = __webpack_require__( 1606 );
+
+/**
+ * @typedef {import('../../typedefs').GitHubContext} GitHubContext
+ * @typedef {import('../../typedefs').GitHub} GitHub
+ */
+
+/**
+ * @param {GitHubContext} context
+ * @param {GitHub} octokit
+ * @param {Object} config
+ */
+module.exports = async ( context, octokit, config ) => {
+	const targetMilestone = await getMilestoneByTitle(
+		context,
+		octokit,
+		config.targetMilestone,
+		'closed'
+	);
+
+	if ( ! targetMilestone ) {
+		debug(
+			`Update Milestone: Could not find the target milestone: ${ config.targetMilestone }`
+		);
+		return;
+	}
+	debug(
+		`Update Milestone: Found the target milestone: ${ config.targetMilestone }`
+	);
+
+	if ( targetMilestone.due_on !== null ) {
+		debug(
+			`Update Milestone: Target milestone: ${ config.targetMilestone } already have a due date.`
+		);
+		return;
+	}
+
+	const updateDueDate = ( milestoneNumber, dueDate ) => {
+		return octokit.issues.updateMilestone( {
+			owner: context.repo.owner,
+			repo: context.repo.repo,
+			milestone_number: milestoneNumber,
+			due_on: dueDate,
+		} );
+	};
+
+	const date = new Date();
+	const dueDate = date.toISOString();
+
+	const milestoneUpdate = await updateDueDate(
+		targetMilestone.number,
+		dueDate
+	);
+
+	if ( ! milestoneUpdate ) {
+		debug(
+			`Update Milestone: Could not update the due date of the milestone: ${ config.targetMilestone }`
+		);
+		return;
+	}
+
+	debug(
+		`Update Milestone: Milstone ${ config.targetMilestone } successfully updated with the ${ dueDate } due date.`
+	);
 };
 
 
