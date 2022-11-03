@@ -455,7 +455,10 @@ const {
  */
 const insertNewChangelogEntry = ( contents, changelog, releaseVersion ) => {
 	const regex = /== Changelog ==\n/;
-	return contents.replace( regex, `== Changelog ==\n\n= ${ releaseVersion } - ${ new Date().toISOString().split('T')[0] } =\n\n${ changelog }`);
+	return contents.replace(
+		regex,
+		`== Changelog ==\n\n= ${ releaseVersion } - ${ new Date().toISOString().split('T')[0] } =\n\n${ changelog }`
+	);
 }
 /**
  * @param {GitHubContext} context
