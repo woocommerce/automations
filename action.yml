@@ -22,7 +22,7 @@ inputs:
         default: minor
     target_milestone:
         description: |
-            Milestone title for modifying any milestone.
+            Title of the milestone that will be updated.
         required: false
         default: ''
 runs:
