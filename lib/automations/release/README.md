@@ -4,21 +4,20 @@ This automation handles automating various parts of a somewhat opinionated relea
 
 Currently:
 
--   it reacts to the `create` (create branch) event (which is triggered when you [create a branch using the GitHub UI](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-and-deleting-branches-within-your-repository#creating-a-branch)).
--   if a created branch has the format `release/x.x.x` where `x.x.x` is the version being released...
-
-    -   automation will check if there's already a pull request created for this release branch and if yes then stop here. Otherwise...
-    -   will create a pull request using `.github/release-pull-request.md` or `.github/patch-release-pull-request.md` templates found in the project's repo or falling back to the templates in this action.
-    -   will generate and add the changelog for the release to the pull request description (using the configuration provided in the project's `.github/release-automation-config.json` file).
-    -   will generate a release checklist using the `.github/release-initial-checklist.md` or `.github/patch-initial-checklist.md` templates and add as a comment on the pull request for the branch.
-
+- it reacts to the `create` (create branch) event (which is triggered when you [create a branch using the GitHub UI](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-and-deleting-branches-within-your-repository#creating-a-branch)).
+- if a created branch has the format `release/x.x.x` where `x.x.x` is the version being released...
+  - automation will check if there's already a pull request created for this release branch and if yes then stop here. Otherwise...
+  - will create a pull request using `.github/release-pull-request.md` or `.github/patch-release-pull-request.md` templates found in the project's repo or falling back to the templates in this action.
+  - will generate and add the changelog for the release to the pull request description (using the configuration provided in the project's `.github/release-automation-config.json` file).
+  - will generate a release checklist using the `.github/release-initial-checklist.md` or `.github/patch-initial-checklist.md` templates and add as a comment on the pull request for the branch.
+  
 ### Changelog generation
 
 This automation will automatically generate a changelog from all the closed pull requests in the milestone matching the release version. So if your release branch is `release/3.1.0` then a milestone with the title `3.1.0` will be looked for and if it exists, all closed prs in that milestone will be used for generating the changelog.
 
 The changelog entry will be generated:
 
--   Using the special formatted changelog entry in the pull request body if it exists. Otherwise the pull request title is used. Example:
+- Using the special formatted changelog entry in the pull request body if it exists. Otherwise the pull request title is used. Example:
 
 ```
 ### Changelog
@@ -26,8 +25,8 @@ The changelog entry will be generated:
 > This is a custom changelog note.
 ```
 
--   Using labels to group changelog entries by type (following the labels in the automation config).
--   If no matching label, attempt to derive the type from the text of the entry (i.e. the word "Fixed" would trigger belonging to "Bug" group).
+- Using labels to group changelog entries by type (following the labels in the automation config).
+- If no matching label, attempt to derive the type from the text of the entry (i.e. the word "Fixed" would trigger belonging to "Bug" group). 
 
 ## Usage
 
@@ -69,25 +68,25 @@ You can customize the output of various content in the pull request via adding t
 
 The following templates are used for the pull request description:
 
-| Template file name        | Used when...                                                              |
-| ------------------------- | ------------------------------------------------------------------------- |
-| `release-pull-request.md` | The release is not a patch release (i.e. `4.1.0`, or `3.2.0`, or `4.0.0`) |
-| `patch-pull-request.md`   | The release is a patch release (i.e. `3.2.2` or `4.0.1`)                  |
+| Template file name | Used when... |
+| ------------------ | ------------ |
+| `release-pull-request.md` | The release is not a patch release (i.e. `4.1.0`, or `3.2.0`, or `4.0.0`)
+| `patch-pull-request.md` | The release is a patch release (i.e. `3.2.2` or `4.0.1`)
 
 Templates utilize handlebars template format and will receive the following variables:
 
--   `version`: Implemented by `{{version}}`. This will be replaced by the detected version from the release branch.
--   `changelog`: Implemented by `{{changelog}}`. This will be replaced by the generated changelog.
--   `devNoteItems`: Implemented by `{{devNoteItems}}`. This will be replaced by any changelog items designated as a dev note.
+- `version`: Implemented by `{{version}}`. This will be replaced by the detected version from the release branch.
+- `changelog`: Implemented by `{{changelog}}`. This will be replaced by the generated changelog.
+- `devNoteItems`: Implemented by `{{devNoteItems}}`. This will be replaced by any changelog items designated as a dev note.
 
 ### Release checklist (added as a comment on the pull request)
 
 The following templates are used for the release checklist added as a comment on the pull request.
 
-| Template file name             | Used when...                                                              |
-| ------------------------------ | ------------------------------------------------------------------------- |
-| `release-initial-checklist.md` | The release is not a patch release (i.e. `4.1.0`, or `3.2.0`, or `4.0.0`) |
-| `patch-initial-checklist.md`   | The release is a patch release (i.e. `3.2.2` or `4.0.1`)                  |
+| Template file name | Used when... |
+| ------------------ | ------------ |
+| `release-initial-checklist.md` | The release is not a patch release (i.e. `4.1.0`, or `3.2.0`, or `4.0.0`)
+| `patch-initial-checklist.md` | The release is a patch release (i.e. `3.2.2` or `4.0.1`)
 
 The same variables are available in these templates as were available in the pull request description templates.
 
@@ -99,7 +98,7 @@ The configuration file has the following properties:
 
 **`labelTypeMap`** and `labelType
 
-These will map label types to a heading for grouping the changelog. For instance if you prefix your issue types with `type:` (eg. `type: bug`), then you would give the `labelTypePrefix` a value of `type:` and implement `bug` as a property in the `labelTypeMap`.
+These will map label types to a heading for grouping the changelog. For instance if you prefix your issue types with `type:` (eg. `type: bug`), then you would give the `labelTypePrefix` a value of `type: ` and implement `bug` as a property in the `labelTypeMap`.
 
 **`groupTitleOrder`**
 
@@ -127,8 +126,8 @@ You can add any labels here which will be attached to the new PR automatically c
 
 ### Inputs
 
--   `github_token`: Required. GitHub API token to use for making API requests. You can use the default `secrets.GITHUB_TOKEN` used by GitHub actions or store a different one in the secrets configuration of your GitHub repository.
--   `automations`: Optional. You can include a comma-delimited list of specific automations you want to run if you don't want to use them all in a given workflow.
+- `github_token`: Required. GitHub API token to use for making API requests. You can use the default `secrets.GITHUB_TOKEN` used by GitHub actions or store a different one in the secrets configuration of your GitHub repository.
+- `automations`: Optional. You can include a comma-delimited list of specific automations you want to run if you don't want to use them all in a given workflow.
 
 ### Outputs
 
