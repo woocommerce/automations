@@ -82,6 +82,9 @@ exports.gimmeOctokit = () => {
 						.mockName( 'issues.listForRepo.endpoint.merge' ),
 				},
 			},
+			updateMilestone: jest
+				.fn( () => Promise.resolve( { data: true } ) )
+				.mockName( 'issues.updateMilestone' ),
 		},
 		git: {
 			getCommit: jest
@@ -137,6 +140,16 @@ exports.gimmeOctokit = () => {
 										{ title: '3.0.1', number: 301 },
 										{ title: '3.1.0', number: 310 },
 										{ title: '4.0.0', number: 400 },
+										{
+											title: '5.0.0',
+											number: 6,
+											due_on: null,
+										},
+										{
+											title: '7.0.0',
+											number: 8,
+											due_on: '2022-12-21T11:11:05Z',
+										},
 									],
 								},
 							] )();
