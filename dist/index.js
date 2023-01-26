@@ -425,7 +425,7 @@ const core = __webpack_require__( 2186 );
  * Internal dependencies
  */
 const { getTemplate, TEMPLATES, compile } = __webpack_require__( 1274 );
-const { lineBreak } = __webpack_require__( 1606 );
+const { lineBreak, getMilestoneByTitle } = __webpack_require__( 1606 );
 const debug = __webpack_require__( 5800 );
 const {
 	getReleaseVersion,
@@ -746,6 +746,60 @@ const branchHandler = async ( context, octokit, config ) => {
 		issue_number: prCreated.data.number,
 		body: commentBody,
 	} );
+
+	// Get existing milestone
+	const milestone = await getMilestoneByTitle(
+		context,
+		octokit,
+		releaseVersion,
+		'open'
+	);
+	const milestoneNumber = milestone.number;
+	const milestoneTitle = milestone.title
+		.replace( '"', '' )
+		.replace( '[', '' )
+		.replace( ']', '' );
+	// Close existing milestone
+	const milestoneUpdate = await octokit.issues.updateMilestone( {
+		owner: owner,
+		repo: repo,
+		milestone_number: milestoneNumber,
+		state: 'closed',
+	} );
+	if ( ! milestoneUpdate ) {
+		debug(
+			`releaseAutomation: Could not close the milestone: ${ milestoneTitle }`
+		);
+		return;
+	}
+	debug(
+		`releaseAutomation: Successfully milestone closed: ${ milestoneTitle }`
+	);
+	// Create new milestone if it's not a patch release
+	if ( ! isPatchRelease( releaseVersion ) ) {
+		const milestoneTitleArray = milestoneTitle.split( '.' );
+		const nextMilestone =
+			parseInt( milestoneTitleArray[ 1 ] ) < 9
+				? `${ milestoneTitleArray[ 0 ] }.${
+						parseInt( milestoneTitleArray[ 1 ] ) + 1
+					}.0`
+				: `${ parseInt( milestoneTitleArray[ 0 ] ) + 1 }.0.0`;
+		const createMilestone = await octokit.issues.createMilestone( {
+			owner: owner,
+			repo: repo,
+			title: nextMilestone,
+			state: 'open',
+		} );
+		if ( ! createMilestone ) {
+			debug(
+				`releaseAutomation: Could not create the  new milestone: ${ nextMilestone }`
+			);
+			return;
+		}
+		debug(
+			`releaseAutomation: Created a new milestone: ${ nextMilestone }`
+		);
+	}
 };
 
 /**
