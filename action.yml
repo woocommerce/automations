@@ -20,6 +20,11 @@ inputs:
                 'major' - Assign to the next major version.
         required: false
         default: minor
+    target_milestone:
+        description: |
+            Title of the milestone that will be updated.
+        required: false
+        default: ''
 runs:
     using: 'node12'
     main: 'dist/index.js'
