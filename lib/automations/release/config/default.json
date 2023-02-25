@@ -30,5 +30,9 @@
 	"needsDevNoteLabel": "status:needs-dev-note",
 	"labelsToOmit": [
 		"skip-changelog"
+	],
+	"releasePRLabels": [
+		"skip-changelog",
+		"type: release"
 	]
 }

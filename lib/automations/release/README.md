@@ -118,6 +118,10 @@ This is a label your project uses to indicate pull requests that require some ad
 
 You can add any labels here that the changelog generator should use as a signal to omit the pull request from being included in the generated changelog.
 
+**`releasePRLabels`**
+
+You can add any labels here which will be attached to the new PR automatically created for each release. It defaults to adding `type: release` and `skip-changelog`.
+
 ## API
 
 ### Inputs

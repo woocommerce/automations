@@ -6,7 +6,7 @@ module.exports =
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse("{\"labelTypePrefix\":\"type: \",\"labelTypeMap\":{\"bug\":\"Bug Fixes\",\"regression\":\"Bug Fixes\",\"feature\":\"Features\",\"enhancement\":\"Enhancements\",\"new api\":\"New APIs\",\"experimental\":\"Experiments\",\"task\":\"Various\"},\"groupTitleOrder\":[\"Features\",\"Enhancements\",\"New APIs\",\"Bug Fixes\",\"Performance\",\"Experiments\",\"Documentation\",\"Code Quality\",\"undefined\",\"Various\"],\"rewordTerms\":{\"e2e\":\"end-to-end\",\"url\":\"URL\",\"config\":\"configuration\",\"docs\":\"documentation\"},\"needsDevNoteLabel\":\"status:needs-dev-note\",\"labelsToOmit\":[\"skip-changelog\"]}");
+module.exports = JSON.parse("{\"labelTypePrefix\":\"type: \",\"labelTypeMap\":{\"bug\":\"Bug Fixes\",\"regression\":\"Bug Fixes\",\"feature\":\"Features\",\"enhancement\":\"Enhancements\",\"new api\":\"New APIs\",\"experimental\":\"Experiments\",\"task\":\"Various\"},\"groupTitleOrder\":[\"Features\",\"Enhancements\",\"New APIs\",\"Bug Fixes\",\"Performance\",\"Experiments\",\"Documentation\",\"Code Quality\",\"undefined\",\"Various\"],\"rewordTerms\":{\"e2e\":\"end-to-end\",\"url\":\"URL\",\"config\":\"configuration\",\"docs\":\"documentation\"},\"needsDevNoteLabel\":\"status:needs-dev-note\",\"labelsToOmit\":[\"skip-changelog\"],\"releasePRLabels\":[\"skip-changelog\",\"type: release\"]}");
 
 /***/ }),
 
@@ -460,9 +460,11 @@ const insertNewChangelogEntry = ( contents, changelog, releaseVersion ) => {
 	const regex = /== Changelog ==\n/;
 	return contents.replace(
 		regex,
-		`== Changelog ==\n\n= ${ releaseVersion } - ${ new Date().toISOString().split('T')[0] } =\n\n${ changelog }`
+		`== Changelog ==\n\n= ${ releaseVersion } - ${
+			new Date().toISOString().split( 'T' )[ 0 ]
+		} =\n\n${ changelog }`
 	);
-}
+};
 
 /**
  * Inserts the new changelog entry into the readme file contents
@@ -741,6 +743,12 @@ const branchHandler = async ( context, octokit, config ) => {
 	const commentBody = lineBreak(
 		compile( initialChecklistTemplate )( templateData )
 	);
+
+	await octokit.issues.addLabels( {
+		...context.repo,
+		issue_number: prCreated.data.number,
+		labels: config.releasePRLabels,
+	} );
 
 	await octokit.issues.createComment( {
 		...context.repo,
