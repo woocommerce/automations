@@ -19,7 +19,7 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
     - run: npm ci
-    - uses: mattallty/jest-github-action@v1
+    - uses: mattallty/jest-github-action@40eafe1b6e3924992dd7e3b0a07e70dfdff1d52f # v1
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
