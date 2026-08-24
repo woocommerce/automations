@@ -11,7 +11,7 @@ jobs:
     if: ${{ github.event.ref_type == 'branch' && contains( github.ref, 'release/' ) }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2
       - run: |
           date > .release-artifact
           git config user.name github-actions
