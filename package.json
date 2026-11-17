@@ -29,7 +29,7 @@
 		"@actions/github": "^4.0.0",
 		"@vercel/ncc": "^0.25.1",
 		"hbs": "^4.4.0",
-		"lodash": "4.17.15",
+		"lodash": "4.18.1",
 		"parse-diff": "^0.7.1"
 	},
 	"devDependencies": {
