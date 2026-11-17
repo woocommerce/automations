@@ -63,8 +63,24 @@ exports.gimmeOctokit = () => {
 	};
 
 	return {
+		request: jest
+			.fn( ( route ) => {
+				switch ( route ) {
+					case 'GET /repos/WordPress/WordPress/tags':
+						return Promise.resolve( {
+							data: [ { name: '6.1.1' } ],
+						} );
+					case 'GET /repos/woocommerce/woocommerce/releases/latest':
+						return Promise.resolve( { data: { name: '7.3.0' } } );
+				}
+				return Promise.resolve( { data: {} } );
+			} )
+			.mockName( 'request' ),
 		issues: {
 			update: jest.fn().mockName( 'issues.update' ),
+			addLabels: jest
+				.fn( () => Promise.resolve( { data: [] } ) )
+				.mockName( 'issues.addLabels' ),
 			createComment: jest.fn().mockName( 'issues.createComment' ),
 			listComments: jest
 				.fn( () => Promise.resolve( { data: [] } ) )
@@ -85,6 +101,9 @@ exports.gimmeOctokit = () => {
 			updateMilestone: jest
 				.fn( () => Promise.resolve( { data: true } ) )
 				.mockName( 'issues.updateMilestone' ),
+			createMilestone: jest
+				.fn( () => Promise.resolve( { data: true } ) )
+				.mockName( 'issues.createMilestone' ),
 		},
 		git: {
 			getCommit: jest
@@ -111,6 +130,9 @@ exports.gimmeOctokit = () => {
 				.fn( () => Promise.resolve( { data: { content: '' } } ) )
 				.mockName( 'repos.getContent' ),
 			getBranch: jest.fn().mockName( 'repos.getBranch' ),
+			createOrUpdateFileContents: jest
+				.fn( () => Promise.resolve( { data: {} } ) )
+				.mockName( 'repos.createOrUpdateFileContents' ),
 			listReleases: jest
 				.fn( () =>
 					Promise.resolve( {
